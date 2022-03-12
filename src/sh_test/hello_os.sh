@@ -1,8 +1,11 @@
 #!/bin/bash
 #make a new dir
 touch $2
-sed '8p' $1 >> $2
-sed '32p' $1 >> $2
-sed '128p' $1 >> $2
-sed '512p' $1 >> $2
-sed '1024p' $1 >> $2
+rm $2
+touch $2
+a=8
+while [ $a -le 1024 ]
+do 
+	sed -n ${a}'p' $1 >> $2
+	a=$[$a*4]
+done
