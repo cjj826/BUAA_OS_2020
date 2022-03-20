@@ -40,7 +40,7 @@ lp_Print(void (*output)(void *, char *, int),
       (*output)(arg, s, l); \
     } \
   }
-    
+   	
     char buf[LP_MAX_BUF];
 
     char c;
@@ -62,18 +62,18 @@ lp_Print(void (*output)(void *, char *, int),
         Exercise 1.5. Please fill in two parts in this file.
     */
 
-    for(;;) {
-
+    for(; *fmt != '\0';) {
+	//*fmt == '\0' quit	
         /* Part1: your code here */
 
-	{ 
+	while(*fmt != '%' && *fmt != '\0') {
+		
+		OUTPUT(arg, fmt, 1);
+		fmt++;
 	    /* scan for the next '%' */
-	    /* flush the string found so far */
-
+	    /* flush the string found so far */		
 	    /* check "are we hitting the end?" */
-	}
-
-	
+	} 	
 	/* we found a '%' */
 	
 	/* check for long */
@@ -81,7 +81,64 @@ lp_Print(void (*output)(void *, char *, int),
 	/* check for other prefixes */
 
 	/* check format flag */
+	if (*fmt == '\0') {
+		break;	
+	}
 	
+	if (*fmt == '%') {
+        fmt++;//next
+        int count = 0;
+        while (count < 4) {
+        	switch(count) {
+        		case 0:
+        			if (*fmt == '-') {
+        				ladjust = 1;
+        				fmt++;
+					} else if (*fmt == '0') {
+						ladjust = 0;
+						padc = '0';
+						fmt++;
+					} else {
+						ladjust = 0;
+						padc = ' ';
+					}
+					count++;
+					break;
+				case 1:
+					width = 0;
+					while (IsDigit(*fmt)) {
+						width *= 10;
+						width += Ctod(*fmt);
+						fmt++;
+					}
+					count++;
+					break;
+				case 2:
+					prec = 6;
+					if (*fmt == '.') {
+						fmt++;//there must be a num after doc 
+						prec = 0;
+						while (IsDigit(*fmt)) {
+							prec *= 10;
+							prec += Ctod(*fmt);
+							fmt++;
+						}
+					}
+					count++;
+					break;
+        		case 3:
+					longFlag = 0;
+        			if (*fmt == 'l') {
+        				longFlag = 1;
+        				fmt++;
+					}
+					count++;
+					break;
+				default :
+					break;
+			}
+		}                        
+	}	
 
 	negFlag = 0;
 	switch (*fmt) {
@@ -102,7 +159,12 @@ lp_Print(void (*output)(void *, char *, int),
 	    } else { 
 		num = va_arg(ap, int); 
 	    }
-	    
+	    if (num < 0) {
+			num = -num;
+			negFlag = 1;
+		}
+		length = PrintNum(buf, num, 10, negFlag, width, ladjust, padc, 0);
+		OUTPUT(arg, buf, length);
 		/*  Part2:
 			your code here.
 			Refer to other part (case 'b',case 'o' etc.) and func PrintNum to complete this part.

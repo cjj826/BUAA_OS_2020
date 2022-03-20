@@ -1,0 +1,18 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+Ctod	print.c	16;"	d	file:
+INCLUDES	Makefile	/^INCLUDES := -I.\/ -I..\/ -I..\/include\/$/;"	m
+IsDigit	print.c	15;"	d	file:
+OUTPUT	print.c	36;"	d	file:
+PrintChar	print.c	/^PrintChar(char * buf, char c, int length, int ladjust)$/;"	f
+PrintNum	print.c	/^PrintNum(char * buf, unsigned long u, int base, int negFlag, $/;"	f
+PrintString	print.c	/^PrintString(char * buf, char* s, int length, int ladjust)$/;"	f
+_panic	printf.c	/^_panic(const char *file, int line, const char *fmt,...)$/;"	f
+lp_Print	print.c	/^lp_Print(void (*output)(void *, char *, int), $/;"	f
+myoutput	printf.c	/^static void myoutput(void *arg, char *s, int l)$/;"	f	file:
+printf	printf.c	/^void printf(char *fmt, ...)$/;"	f
+theFatalMsg	print.c	/^static const char theFatalMsg[] = "fatal error in lp_Print!";$/;"	v	file:

@@ -14,8 +14,11 @@
 
 int main()
 {
+	//printf("21\t31\n");
+//	printf("\nvcjj\n");
+//	printf("is a man");
 	printf("main.c:\tmain is start ...\n");
-
+//	printf("main.c:\tmain is start ...\n");
 	mips_init();
 	panic("main is over is error!");
 
