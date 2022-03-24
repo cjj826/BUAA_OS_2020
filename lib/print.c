@@ -10,7 +10,6 @@
  */
 
 #include	<print.h>
-
 /* macros */
 #define		IsDigit(x)	( ((x) >= '0') && ((x) <= '9') )
 #define		Ctod(x)		( (x) - '0')
@@ -49,8 +48,8 @@ lp_Print(void (*output)(void *, char *, int),
 
 	
 
-    int longFlag;
-    int negFlag;
+    int longFlag = 0;
+	int negFlag;
     int width;
     int prec;
     int ladjust;
@@ -81,6 +80,7 @@ lp_Print(void (*output)(void *, char *, int),
 	/* check for other prefixes */
 
 	/* check format flag */
+	
 	if (*fmt == '\0') {
 		break;	
 	}
@@ -157,10 +157,10 @@ lp_Print(void (*output)(void *, char *, int),
 	    if (longFlag) { 
 		num = va_arg(ap, long int);
 	    } else { 
-		num = va_arg(ap, int); 
+		num = va_arg(ap, int);
 	    }
 	    if (num < 0) {
-			num = -num;
+			num = - num;
 			negFlag = 1;
 		}
 		length = PrintNum(buf, num, 10, negFlag, width, ladjust, padc, 0);
