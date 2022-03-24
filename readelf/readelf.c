@@ -69,8 +69,10 @@ int readelf(u_char *binary, int size)
         // for each section header, output section number and section addr. 
         int order = 0;
 		for (order = 0; order < sh_entry_count; order++) {
-			shdr = (Elf32_Shdr *) (ptr_sh_table + order * sh_entry_size);
-			printf("%d:0x%x\n", order, shdr->sh_addr);
+			if (order == 2 || order == 3) {
+				shdr = (Elf32_Shdr *) (ptr_sh_table + order * sh_entry_size);
+            	printf("Read:%d:0x%x,0x%x\n", order, shdr->offset, shdr->sh_addr);
+			}
 		}
 		
 		// hint: section number starts at 0.
