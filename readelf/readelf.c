@@ -71,7 +71,7 @@ int readelf(u_char *binary, int size)
 		for (order = 0; order < sh_entry_count; order++) {
 			if (order == 2 || order == 3) {
 				shdr = (Elf32_Shdr *) (ptr_sh_table + order * sh_entry_size);
-            	printf("Read:%d:0x%x,0x%x\n", order, shdr->offset, shdr->sh_addr);
+            	printf("Read:%d:0x%x,0x%x\n", order, shdr->sh_offset, shdr->sh_addr);
 			}
 		}
 		
