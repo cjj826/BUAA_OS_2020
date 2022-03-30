@@ -20,7 +20,25 @@ int main()
 //	printf("%d\n",-20);
 //	printf("\nvcjj\n");
 //	printf("is a man");
-	printf("main.c:\tmain is start ...\n");//	printf("main.c:\tmain is start ...\n");
+
+//	printf("%\n");
+//	printf("%%\n");
+//	printf("%0-0-0----d\n",24);
+//	printf("csd%/%d\n",24);
+//	printf("%0-021.21d\n",25);
+//	printf("%ld\n",-12312);
+//	printf("%053.78ld\n",-0000123);
+//	printf("sda%\n");
+//	printf("%s\n","cdss");
+//	printf("%x%X\n",1231,32);
+//	printf("%023lb\n", 231);
+//	printf("%lb\n", -10);
+//	printf("%lO\n", 1231);
+	printf("%lx\n", 213);
+//	printf("%0--031u\n", 123);
+//	printf("%c\n", '-');
+	printf("main.c:\tmain is start ...\n");
+//	printf("main.c:\tmain is start ...\n");
 	mips_init();
 	panic("main is over is error!");
 

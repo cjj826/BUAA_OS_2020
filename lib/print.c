@@ -91,16 +91,15 @@ lp_Print(void (*output)(void *, char *, int),
         while (count < 4) {
         	switch(count) {
         		case 0:
-        			if (*fmt == '-') {
-        				ladjust = 1;
-        				fmt++;
-					} else if (*fmt == '0') {
-						ladjust = 0;
-						padc = '0';
+					ladjust = 0;
+					padc = ' ';
+        			while (*fmt == '-' || *fmt == '0') {
+        				if (*fmt == '-') {
+        					ladjust = 1;
+						} else if (*fmt == '0') {
+							padc = '0';
+						}
 						fmt++;
-					} else {
-						ladjust = 0;
-						padc = ' ';
 					}
 					count++;
 					break;
