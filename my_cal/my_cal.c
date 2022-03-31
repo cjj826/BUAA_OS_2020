@@ -7,7 +7,7 @@ void my_cal() {
 	int res[1000];
 	int tot = 0;
 
-	int num = 0;
+	long num = 0;
 	while (c != '\n') {
 		num *= 10;
 		num = num +  c - '0';
