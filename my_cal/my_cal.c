@@ -23,7 +23,11 @@ void my_cal() {
 	}
 	res[tot] = num;
 	int i;
-	for (i = tot; i >= 0 ; i--) {
+	for (i = tot; i >= 0; i--) {
+		if (res[i] != 0) 
+			break;
+	}
+	for ( ; i >= 0 ; i--) {
 		_my_putchar(res[i] + '0');
 	} 
 	} 
