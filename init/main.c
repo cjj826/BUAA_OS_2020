@@ -14,7 +14,7 @@
 
 int main()
 {
-//	printf("cjjis%-ld\n", 20);
+	printf("%");
 //	printf("%ld\n", 10);
 //	printf("%ld\n",-6);
 //	printf("%d\n",-20);

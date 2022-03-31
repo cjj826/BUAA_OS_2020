@@ -19,7 +19,7 @@ objects		  := $(boot_dir)/start.o			  \
 				 $(init_dir)/main.o			  \
 				 $(init_dir)/init.o			  \
 			   	 $(drivers_dir)/gxconsole/console.o \
-				 $(lib_dir)/*.o
+				 $(lib_dir)/*.o               
 
 ifneq ($(test_dir),)
 objects :=$(objects) $(test_dir)/*.o
@@ -39,6 +39,9 @@ $(modules):
 
 run:
 	/OSLAB/gxemul -E testmips -C R3000 -M 64 $(vmlinux_elf)
+
+debug:
+	/OSLAB/gxemul -E testmips -C R3000 -M 64 -V $(vmlinux_elf)
 
 clean: 
 	for d in $(modules);	\
