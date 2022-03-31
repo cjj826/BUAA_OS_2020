@@ -16,19 +16,19 @@ void my_cal() {
 
 	if (num == 0) {
 		_my_putchar('0');
-	}	else {
-	while (num) {
-		res[tot++] = num % 2;
-		num = num / 2;
-	}
-	res[tot] = num;
-	int i;
-	for (i = tot; i >= 0; i--) {
-		if (res[i] != 0) 
-			break;
-	}
-	for ( ; i >= 0 ; i--) {
-		_my_putchar(res[i] + '0');
-	} 
+	} else {
+		while (num/2) {
+			res[tot++] = num % 2;
+			num = num / 2;
+		}
+		res[tot] = num;
+		int i;
+		for (i = tot; i >= 0; i--) {
+			if (res[i] != 0) 
+				break;
+		}
+		for ( ; i >= 0 ; i--) {
+			_my_putchar(res[i] + '0');
+		} 
 	} 
 }
