@@ -16,7 +16,7 @@ LEAF(_my_getchar)
 	loop2:
 		li t2, 10
 		sb t2, 0(t0)
-	end_loop2
+	end_loop2:
 
 	or v0, zero, t1
 	jr ra
@@ -29,6 +29,6 @@ LEAF(_my_putchar)
 END(_my_putchar)
 
 LEAF(_my_exit)
-	li $t0, 0xB0000000
+	li t0, 0xB0000000
 	sb zero, 0x10(t0)
 END(_my_exit)
