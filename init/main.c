@@ -11,9 +11,22 @@
 
 #include <printf.h>
 #include <pmap.h>
+struct mystruct{
+	int size;
+	char c;
+	int array[2];
+};
 
 int main()
 {
+
+	struct mystruct t1;
+	t1.size = 3;
+	t1.c = 'b';
+	t1.array[0] = -1;
+	t1.array[1] = 2;
+	//t1.array[2] = 3;
+	printf("%T", &t1);
 	printf("%04d", 30);
 //	printf("%ld\n", 10);
 //	printf("%ld\n",-6);

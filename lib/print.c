@@ -14,7 +14,7 @@
 #define		IsDigit(x)	( ((x) >= '0') && ((x) <= '9') )
 #define		Ctod(x)		( (x) - '0')
 
-struct s {
+struct mystruct {
 	int size;
 	char c;
 	int array[];
@@ -61,7 +61,7 @@ lp_Print(void (*output)(void *, char *, int),
     char padc;
 
     int length;
-	struct s * addr;
+	struct mystruct * addr;
 
     /*
         Exercise 1.5. Please fill in two parts in this file.
@@ -165,7 +165,7 @@ lp_Print(void (*output)(void *, char *, int),
 		num = va_arg(ap, int);
 	    }
 	    if (num < 0) {
-			num = - num;
+			num = -num;
 			negFlag = 1;
 		}
 		length = PrintNum(buf, num, 10, negFlag, width, ladjust, padc, 0);
@@ -249,12 +249,13 @@ lp_Print(void (*output)(void *, char *, int),
 		#define PrintInt(x) \
 			{ \
 				num = x; \
-				if (num < 0 ) {num = - num;  negFlag = 1; }\
+				if (num < 0) {num = -num;  negFlag = 1; }\
 				length = PrintNum(buf, num, 10, negFlag, width, ladjust, padc, 0); \
 				 OUTPUT(arg, buf, length); \
+				 negFlag = 0;\
 			} 
 
-		addr = (struct s*) va_arg(ap, int);	
+		addr = (struct mystruct*) va_arg(ap, int);	
 		int size = addr->size;
 		
 	//print {
