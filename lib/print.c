@@ -236,9 +236,15 @@ lp_Print(void (*output)(void *, char *, int),
 		
 		#define PrintC(c) \
 			{ \
-				length = PrintChar(buf, c, 0, ladjust); \
+				length = PrintChar(buf, c, width, ladjust); \
 				OUTPUT(arg, buf, length); \
 			} 
+
+		#define PrintCh(c) \
+            { \
+                length = PrintChar(buf, c, 0, ladjust); \
+                OUTPUT(arg, buf, length); \
+            } 
 
 		#define PrintInt(x) \
 			{ \
@@ -252,22 +258,22 @@ lp_Print(void (*output)(void *, char *, int),
 		int size = addr->size;
 		
 	//print {
-		PrintC('{');
+		PrintCh('{');
 	//print size
 		PrintInt(addr->size);
-		PrintC(',');
+		PrintCh(',');
 	//print c
 		PrintC(addr->c);
-		PrintC(',');
+		PrintCh(',');
 	//print array
 		int index;
 		for (index = 0; index < size; index++) {
 			PrintInt(addr->array[index]);
 			if (index != size-1 ) {
-				PrintC(',');
+				PrintCh(',');
 			}
 		}
-		PrintC('}'); 
+		PrintCh('}'); 
 		break;
 
 	 case '\0':
