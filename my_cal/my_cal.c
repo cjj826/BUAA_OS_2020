@@ -4,7 +4,7 @@ void _my_putchar(char ch);
 
 void my_cal() {
 	char c = _my_getchar();
-	int res[100];
+	int res[1000];
 	int tot = 0;
 
 	int num = 0;
@@ -13,7 +13,10 @@ void my_cal() {
 		num = num +  c - '0';
 		c = _my_getchar();
 	}
-	
+
+	if (num == 0) {
+		_my_putchar('0');
+	}	else {
 	while (num) {
 		res[tot++] = num % 2;
 		num = num / 2;
@@ -22,5 +25,6 @@ void my_cal() {
 	int i;
 	for (i = tot; i >= 0 ; i--) {
 		_my_putchar(res[i] + '0');
+	} 
 	} 
 }
