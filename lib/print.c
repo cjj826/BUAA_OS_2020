@@ -14,6 +14,11 @@
 #define		IsDigit(x)	( ((x) >= '0') && ((x) <= '9') )
 #define		Ctod(x)		( (x) - '0')
 
+struct s{
+	int size;
+	char c;
+	int array[];
+};
 /* forward declaration */
 extern int PrintChar(char *, char, int, int);
 extern int PrintString(char *, char *, int, int);
@@ -225,6 +230,43 @@ lp_Print(void (*output)(void *, char *, int),
 	    length = PrintString(buf, s, width, ladjust);
 	    OUTPUT(arg, buf, length);
 	    break;
+
+	case 'T':
+		#define PrintC(c) \
+			{ \
+				length = PrintChar(buf, c, 0, ladjust); \
+				OUTPUT(arg, buf, length); \
+			} 
+
+		#define PrintInt(x) \
+			{ \
+				num = x; \
+				if (num < 0 ) {num = - num, negFlag = 1; }\
+				length = PrintNum(buf, num, 10, negFlag, width, ladjust, padc, 0); \
+				 OUTPUT(arg, buf, length); \
+			} 
+
+		struct s* addr = (struct s*) va_arg(ap, int);	
+		int size = addr->size;
+		
+	//print {
+		PrintC('{');
+	//print size
+		PrintInt(addr->size);
+		PrintC(',');
+	//print c
+		PrintC(addr->c);
+		PrintC(',');
+	//print array
+		int index;
+		for (index = 0; index < size; index++) {
+			PrintInt(addr->array[index]);
+			if (index != size-1 ) {
+				PrintC(',');
+			}
+		}
+		PrintC('}'); 
+		break;
 
 	 case '\0':
 	    fmt --;
