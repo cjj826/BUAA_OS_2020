@@ -7,12 +7,13 @@ LEAF(_my_getchar)
 	loop1:
 		lb t1, 0(t0)
 		beq t1, zero, loop1
-		
+		nop
 	end_loop1:
 	sb t1, 0(t0)
 	
 	li t2, 13
 	bne t1, t2, end_loop2
+	nop
 	loop2:
 		li t2, 10
 		sb t2, 0(t0)
@@ -31,4 +32,5 @@ END(_my_putchar)
 LEAF(_my_exit)
 	li t0, 0xB0000000
 	sb zero, 0x10(t0)
+	jr ra
 END(_my_exit)
