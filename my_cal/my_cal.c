@@ -25,10 +25,10 @@ void my_cal() {
 		_my_putchar('0');	
 	} else {
 		int base = 1000000000;
-		while (d / base == 0) base = base / 10;
+		while (res / base == 0) base = base / 10;
 		while (base) {
-			_my_putchar(d / base + '0');
-			d = d % base;
+			_my_putchar(res / base + '0');
+			res = res % base;
 			base = base / 10;
 		}
 	}
