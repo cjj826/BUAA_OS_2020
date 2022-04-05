@@ -192,7 +192,7 @@ void page_init(void)
 	}
 	
 	/* Step 4: Mark the other memory as free. */
-	for (p = &pages[PPN(PADDR(freemem))]; page2ppn(p) < npage; p++) {
+	for (p = pa2page(PADDR(freemem)); page2ppn(p) < npage; p++) {
 		p->pp_ref = 0;
 		LIST_INSERT_HEAD(&page_free_list, p, pp_link);
 	}	
