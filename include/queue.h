@@ -109,17 +109,15 @@
  * already in the list.  The "field" name is the link element
  * as above.
  */
-#define LIST_INSERT_AFTER(listelm, elm, field)           \
-        // Note: assign a to b <==> a = b
-        //Step 1, assign elm.next to listelm.next.
-        //Step 2: Judge whether listelm.next is NULL, if not, then assign listelm.next.pre to a proper value.
-        //step 3: Assign listelm.next to a proper value.
-        //step 4: Assign elm.pre to a proper value.
-		do {                                                 \
-			(elm)->field.le_next = (listelm)->field.le_next; \
-			if ((listelm)->field.le_next 
-	
-		}while(0)
+#define LIST_INSERT_AFTER(listelm, elm, field) do {                                                 \
+            LIST_NEXT((elm), field) = LIST_NEXT((listelm), field); \
+            if (LIST_NEXT((listelm), field) != NULL) {\
+            	LIST_NEXT((listelm), field)->field.le_prev = &LIST_NEXT((elm), field);\
+            } \
+            LIST_NEXT((listelm), field) = (elm); \
+            (elm)->field.le_prev = &LIST_NEXT((listelm), field); \
+        }while(0)
+
 /*
  * Insert the element "elm" *before* the element "listelm" which is
  * already in the list.  The "field" name is the link element
@@ -149,7 +147,19 @@
  * The "field" name is the link element as above. You can refer to LIST_INSERT_HEAD.
  * Note: this function has big differences with LIST_INSERT_HEAD !
  */
-#define LIST_INSERT_TAIL(head, elm, field)
+#define LIST_INSERT_TAIL(head, elm, field) do { \
+	LIST_NEXT((elm), field) = LIST_FIRST((head)); \
+	if (LIST_NEXT((elm), field) == NULL) { \
+		LIST_INSERT_HEAD(head, elm,field); \
+	} else {                               \
+		while (LIST_NEXT((LIST_NEXT((elm), field)), field) != NULL) {   \
+    		LIST_NEXT((elm), field) = LIST_NEXT((LIST_NEXT((elm), field)), field);\
+  		}                                   \
+   		(elm)->field.le_prev = &(LIST_NEXT((LIST_NEXT((elm), field)), field));   \
+		 LIST_NEXT((LIST_NEXT((elm), field)), field) = (elm); \
+   		 LIST_NEXT((elm),field) = NULL;    \
+	} \
+}while(0)
 /* finish your code here. */
 
 
