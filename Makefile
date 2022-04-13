@@ -34,6 +34,8 @@ $(modules):
 
 run:
 	/OSLAB/gxemul -E testmips -C R3000 -M 64 $(vmlinux_elf)
+debug:
+	/OSLAB/gxemul -E testmips -C R3000 -M 64 -V $(vmlinux_elf)  
 
 clean:
 	for d in $(modules);	\
