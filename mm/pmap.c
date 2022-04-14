@@ -220,6 +220,126 @@ void page_init(void)
 	}	
 }
 
+typedef struct Buddy{
+	u_int start;
+	u_int size;
+	u_int time;
+	u_int mode;
+	u_int f;
+}Buddy;
+
+Buddy buddy[100000];
+int tot;
+int time;
+
+void buddy_init(void) {
+	u_int start = 0x2000000;
+	u_int size = 0x400000;
+	int i;
+	tot = 8;
+	time = 0;
+	for (i = 0; i < 8; i++) {
+		buddy[i].start = start + i * size;
+		buddy[i].size = size;
+		buddy[i].time = 0;
+		buddy[i].mode = 0;
+		buddy[i].f = -1;
+	}
+	//printf("buddy init finish");
+}
+
+int buddy_alloc(u_int size, u_int *pa, u_char *pi) {
+	u_int min = 0x4000010;
+	int index = 0;
+	int i;
+	for (i = 0; i < tot; i++) {
+		if (buddy[i].size >= size && buddy[i].mode == 0 && buddy[i].start < min) {
+			min = buddy[i].start;
+			index = i;
+		} 
+	}
+	if (min == 0x4000010) {
+		return -1;
+	}
+	int pos = findMin(index, size);
+//	buddy[pos].mode = 1;
+	*pa = buddy[pos].start;
+	i = 0;
+	u_int num = buddy[pos].size >> 12;
+	//printf("num:%x\n", num);
+	u_int x = 1;
+	while ((num ^ x)) {
+		i++;
+	 	x = x << 1;
+	}
+	*pi = i;
+	//printf("alloc! %d\n%x\n%d\n", pos, pa, *pi);
+	return 0;
+}
+
+int findMin(int i, u_int size) {
+	if (buddy[i].size / 2 < size || buddy[i].size == 0x1000) {
+		buddy[i].mode = 1;
+		//printf("select:%d, mem:%x",i, buddy[i].size);
+		return i; 
+	}
+	time++;
+	u_int s = buddy[i].size / 2;
+	buddy[i].mode = -1;
+	buddy[tot] = buddy[i];
+	buddy[tot].size = s;
+	buddy[tot].time = time;
+	buddy[tot].f = i;
+	buddy[tot].mode = 0;
+	tot++;
+	buddy[tot] = buddy[i];
+	buddy[tot].size = s;
+	buddy[tot].start = buddy[i].start + s;
+	buddy[tot].time = time;
+	buddy[tot].f = i;  
+	buddy[tot].mode = 0;
+	tot++;
+	return findMin(tot-2, size);
+}
+
+void buddy_free(u_int pa) {
+	int i;
+	for (i = tot - 1; i >= 0; i--) {
+		if (buddy[i].mode == 1 && buddy[i].start == pa) {
+			break;
+		}
+	}
+	buddy[i].mode = 0;
+	if (buddy[i].time != 0) {
+		merge(buddy[i].time);
+	}
+}
+
+void merge(u_int time) {
+	int a = -1, b = -1, i;
+	int flag = 0;
+	for (i = tot - 1; i >= 0; i--) {
+		if (buddy[i].mode == 0 && buddy[i].time == time) {
+			if (a == -1) {
+				a = i;
+			} else {
+				b = i;
+				flag = 1;
+				break;
+			}
+		}
+	}
+	if (flag) {
+		buddy[a].mode = -1;
+		buddy[b].mode = -1;
+		buddy[buddy[a].f].mode = 0;
+		if ( buddy[buddy[a].f].time != 0) {
+			merge(buddy[buddy[a].f].time);
+		}
+	}
+}
+
+
 /* Exercise 2.4 */
 /*Overview:
   Allocates a physical page from free memory, and clear this page.
