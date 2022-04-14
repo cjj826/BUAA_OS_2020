@@ -211,11 +211,13 @@ void page_init(void)
 	struct Page * p;
 	for (p = pages; page2kva(p) < freemem; p++) {
 		p->pp_ref = 1;
+		p->pro = '0';
 	}
 	
 	/* Step 4: Mark the other memory as free. */
 	for (p = pa2page(PADDR(freemem)); page2ppn(p) < npage; p++) {
 		p->pp_ref = 0;
+		p->pro = '0';
 		LIST_INSERT_HEAD(&page_free_list, p, pp_link);
 	}	
 }
@@ -243,6 +245,10 @@ int page_alloc(struct Page **pp)
 	if (LIST_EMPTY(&page_free_list)) return -E_NO_MEM;
 	
 	ppage_temp = LIST_FIRST(&page_free_list);
+	
+	while (LIST_NEXT(ppage_temp, pp_link) != NULL && ppage_temp->pro == '1') {
+		ppage_temp = LIST_NEXT(ppage_temp, pp_link);
+	}
 		
 	LIST_REMOVE(ppage_temp, pp_link); //field == struct Page?
 	/* Step 2: Initialize this page.
@@ -252,6 +258,29 @@ int page_alloc(struct Page **pp)
 	*pp = ppage_temp;
 
 	return 0;
+}
+
+int page_status_query(struct Page *pp) {
+	if (pp->pro == '1') {
+		return 3;
+	} else {
+		struct Page *pp_now;
+		LIST_FOREACH(pp_now, &page_free_list, pp_link) {
+			if (pp_now == pp) {
+				return 2;
+			}
+		}
+		return 1;
+	}
+}
+
+int page_protect (struct Page *pp) {
+	if (page_status_query(pp) == 2) {
+		pp->pro = '1';
+		return 0;
+	} else if (page_status_query(pp) == 3) {
+		return -2;
+	} else return -1;
 }
 
 /* Exercise 2.5 */
