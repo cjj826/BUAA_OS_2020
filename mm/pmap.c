@@ -16,9 +16,10 @@ Pde *boot_pgdir;
 struct Page *pages;
 static u_long freemem;
 
-static struct Page_list page_free_list;	/* Free list of physical pages */
+struct Page_list page_free_list;	/* Free list of physical pages */
+struct Page_list fast_page_free_list;
 
-
+u_long bound = 12 << 10;
 /* Exercise 2.1 */
 /* Overview:
    Initialize basemem and npage.
@@ -202,7 +203,7 @@ void page_init(void)
 	/* Step 1: Initialize page_free_list. */
 	/* Hint: Use macro `LIST_INIT` defined in include/queue.h. */
 	LIST_INIT(&page_free_list);
-
+	LIST_INIT(&fast_page_free_list);
 	/* Step 2: Align `freemem` up to multiple of BY2PG. */
 	freemem = ROUND(freemem, BY2PG);
 
@@ -212,11 +213,14 @@ void page_init(void)
 	for (p = pages; page2kva(p) < freemem; p++) {
 		p->pp_ref = 1;
 	}
-	
 	/* Step 4: Mark the other memory as free. */
 	for (p = pa2page(PADDR(freemem)); page2ppn(p) < npage; p++) {
 		p->pp_ref = 0;
-		LIST_INSERT_HEAD(&page_free_list, p, pp_link);
+		if (page2ppn(p) < bound) {
+			LIST_INSERT_HEAD(&page_free_list, p, pp_link);
+		} else {
+			LIST_INSERT_HEAD(&fast_page_free_list, p, pp_link);
+		}
 	}	
 }
 
@@ -254,6 +258,25 @@ int page_alloc(struct Page **pp)
 	return 0;
 }
 
+int fast_page_alloc(struct Page **pp)
+{
+    struct Page *ppage_temp;
+
+    /* Step 1: Get a page from free memory. If fail, return the error code.*/
+    if (LIST_EMPTY(&fast_page_free_list)) return -E_NO_MEM;
+
+    ppage_temp = LIST_FIRST(&fast_page_free_list);
+
+    LIST_REMOVE(ppage_temp, pp_link); //field == struct Page?
+    /* Step 2: Initialize this page.
+     * Hint: use `bzero`. */
+    bzero(page2kva(ppage_temp), BY2PG);
+
+    *pp = ppage_temp;
+
+    return 0;
+}
+
 /* Exercise 2.5 */
 /*Overview:
   Release a page, mark it as free if it's `pp_ref` reaches 0.
@@ -262,8 +285,13 @@ When you free a page, just insert it to the page_free_list.*/
 void page_free(struct Page *pp)
 {
 	/* Step 1: If there's still virtual address referring to this page, do nothing. */
+	
 	if (pp->pp_ref == 0) {
-    	LIST_INSERT_HEAD(&page_free_list, pp, pp_link);
+		if (page2ppn(pp) < bound) {	
+    		LIST_INSERT_HEAD(&page_free_list, pp, pp_link);
+		} else {
+			LIST_INSERT_HEAD(&fast_page_free_list, pp, pp_link);
+		}
     return;
   } else if (pp->pp_ref > 0) return; // in use
 
@@ -275,6 +303,79 @@ void page_free(struct Page *pp)
 	panic("cgh:pp->pp_ref is less than zero\n");
 }
 
+int a[10000];
+struct Page * page_migrate(Pde *pgdir, struct Page *pp) {
+	int tar;
+	if (page2ppn(pp) < bound) {
+		tar = 0;
+	} else {
+		tar = 1;
+	}
+	struct Page *tp;
+	if (tar == 0) {
+		fast_page_alloc(&tp);
+	} else page_alloc(&tp);
+
+	//
+	bcopy(page2kva(pp), page2kva(tp), BY2PG);	
+	
+	int l = inverted_page_lookup(pgdir, pp, a);
+	int i;
+	if (l == 0) {
+		page_free(pp);
+		page_free(tp);
+	} else {
+		 for (i = 0; i < l; i++) {
+    	    int va = a[i] << 12;
+			extra_page_insert(pgdir, tp, va);
+    	}
+	}  
+	return tp;
+}
+
+int extra_page_insert(Pde *pgdir, struct Page *pp, u_long va)
+{
+	u_int PERM;
+    Pte *pgtable_entry;
+    int ret;
+
+    /* Step 1: Get corresponding page table entry. */
+    pgdir_walk(pgdir, va, 0, &pgtable_entry);
+	PERM = (*pgtable_entry) & 0x3ff;
+	tlb_invalidate(pgdir, va);
+	page_remove(pgdir, va);
+	*pgtable_entry = (page2pa(pp) | PERM);
+/*
+    if (pgtable_entry != 0 && (*pgtable_entry & PTE_V) != 0) {
+        if (pa2page(*pgtable_entry) != pp) {
+            page_remove(pgdir, va);
+        } else  {
+            tlb_invalidate(pgdir, va);
+            *pgtable_entry = (page2pa(pp) | PERM);
+            return 0;
+        }
+    }
+    tlb_invalidate(pgdir, va); 
+  */                   // <~~i
+   /* Step 1. use `pgdir_walk` to "walk" the page directory */
+  /*  if ((ret = pgdir_walk(pgdir, va, 1, &pgtable_entry)) < 0)
+        return ret; // exception*/
+    /* Step 2. fill in the page table */
+  /*  *pgtable_entry = (page2pa(pp)) | PERM;
+    pp->pp_ref++;*/
+    /* Step 2: Update TLB. */
+
+    /* hint: use tlb_invalidate function */
+
+
+    /* Step 3: Do check, re-get page table entry to validate the insertion. */
+
+    /* Step 3.1 Check if the page can be insert, if can�~@~Yt return -E_NO_MEM */
+
+    /* Step 3.2 Insert page and increment the pp_ref */
+
+    return 0;
+}
 /* Exercise 2.8 */
 /*Overview:
   Given `pgdir`, a pointer to a page directory, pgdir_walk returns a pointer
@@ -409,6 +510,32 @@ struct Page *page_lookup(Pde *pgdir, u_long va, Pte **ppte)
 
 	return ppage;
 }
+
+int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]) {
+    int i, j;
+    int tot = 0;
+    int n = page2ppn(pp);
+    for (i = 0; i < 1024; i++) {
+        Pde *pgdir_entry = pgdir + i;
+
+        if (*pgdir_entry & PTE_V) {
+            Pte *pgtable = KADDR(PTE_ADDR(*pgdir_entry));
+            for (j = 0; j < 1024; j++) {
+                Pte *pgtable_entry = pgtable + j;
+                if (*pgtable_entry & PTE_V) {
+                    if (PPN(*pgtable_entry) == n) {
+                        int va = i << 10 | j;
+                        vpn_buffer[tot++] = va;
+                    }
+                }
+            }
+        }
+    }
+    if (tot) {
+        return tot;
+    } else return 0;
+}
+
 
 // Overview:
 // 	Decrease the `pp_ref` value of Page `*pp`, if `pp_ref` reaches to 0, free this page.
