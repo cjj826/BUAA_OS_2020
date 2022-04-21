@@ -303,7 +303,7 @@ void page_free(struct Page *pp)
 	panic("cgh:pp->pp_ref is less than zero\n");
 }
 
-int a[10000];
+int a[100000];
 struct Page * page_migrate(Pde *pgdir, struct Page *pp) {
 	int tar;
 	if (page2ppn(pp) < bound) {
