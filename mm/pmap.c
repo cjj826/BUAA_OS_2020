@@ -327,6 +327,7 @@ struct Page * page_migrate(Pde *pgdir, struct Page *pp) {
 	} else {
 		 for (i = 0; i < l; i++) {
     	    int va = a[i] << 12;
+		//	printf("%x\n", va);
 			extra_page_insert(pgdir, tp, va);
     	}
 	}  
@@ -341,7 +342,7 @@ int extra_page_insert(Pde *pgdir, struct Page *pp, u_long va)
 
     /* Step 1: Get corresponding page table entry. */
     pgdir_walk(pgdir, va, 0, &pgtable_entry);
-	PERM = (*pgtable_entry) & 0x3ff;
+	PERM = (*pgtable_entry) & 0x7ff;
 	tlb_invalidate(pgdir, va);
 	page_remove(pgdir, va);
 	*pgtable_entry = (page2pa(pp) | PERM);
