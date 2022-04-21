@@ -323,7 +323,7 @@ struct Page * page_migrate(Pde *pgdir, struct Page *pp) {
 	int i;
 	if (l == 0) {
 		page_free(pp);
-//		page_free(tp);
+		page_free(tp);
 	} else {
 		 for (i = 0; i < l; i++) {
     	    int va = a[i] << 12;
