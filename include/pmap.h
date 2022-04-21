@@ -95,6 +95,7 @@ void page_decref(struct Page *pp);
 int pgdir_walk(Pde *pgdir, u_long va, int create, Pte **ppte);
 int page_insert(Pde *pgdir, struct Page *pp, u_long va, u_int perm);
 struct Page *page_lookup(Pde *pgdir, u_long va, Pte **ppte);
+int invert_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]);
 void page_remove(Pde *pgdir, u_long va) ;
 void tlb_invalidate(Pde *pgdir, u_long va);
 

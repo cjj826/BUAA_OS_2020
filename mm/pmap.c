@@ -410,6 +410,33 @@ struct Page *page_lookup(Pde *pgdir, u_long va, Pte **ppte)
 	return ppage;
 }
 
+
+int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]) {
+	int i, j;
+	int tot = 0;
+	int n = page2ppn(pp);
+	for (i = 0; i < 1024; i++) {
+		Pde *pgdir_entry = pgdir + i;
+		
+		if (*pgdir_entry & PTE_V) {
+			Pte *pgtable = KADDR(PTE_ADDR(*pgdir_entry));
+			for (j = 0; j < 1024; j++) {
+				Pte *pgtable_entry = pgtable + j;
+				if (*pgtable_entry & PTE_V) {
+					if (PPN(*pgtable_entry) == n) {
+						int va = i << 10 | j;
+						vpn_buffer[tot++] = va;
+					}				
+				}
+			}
+		}
+	}
+	if (tot) {
+		return tot;
+	} else return 0;
+}
+
+
 // Overview:
 // 	Decrease the `pp_ref` value of Page `*pp`, if `pp_ref` reaches to 0, free this page.
 void page_decref(struct Page *pp) {
