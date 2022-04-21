@@ -19,7 +19,7 @@ static u_long freemem;
 struct Page_list page_free_list;	/* Free list of physical pages */
 struct Page_list fast_page_free_list;
 
-u_long bound = 12 << 10;
+u_long bound = 12288;
 /* Exercise 2.1 */
 /* Overview:
    Initialize basemem and npage.
@@ -323,12 +323,13 @@ struct Page * page_migrate(Pde *pgdir, struct Page *pp) {
 	int i;
 	if (l == 0) {
 		page_free(pp);
-		page_free(tp);
+//		page_free(tp);
 	} else {
 		 for (i = 0; i < l; i++) {
     	    int va = a[i] << 12;
 		//	printf("%x\n", va);
 			extra_page_insert(pgdir, tp, va);
+			a[i] = 0;
     	}
 	}  
 	return tp;
@@ -338,11 +339,10 @@ int extra_page_insert(Pde *pgdir, struct Page *pp, u_long va)
 {
 	u_int PERM;
     Pte *pgtable_entry;
-    int ret;
 
     /* Step 1: Get corresponding page table entry. */
     pgdir_walk(pgdir, va, 0, &pgtable_entry);
-	PERM = (*pgtable_entry) & 0x7ff;
+	PERM = (*pgtable_entry) & 0xfff;
 	tlb_invalidate(pgdir, va);
 	page_remove(pgdir, va);
 	*pgtable_entry = (page2pa(pp) | PERM);
