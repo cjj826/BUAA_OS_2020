@@ -346,7 +346,7 @@ int extra_page_insert(Pde *pgdir, struct Page *pp, u_long va)
 	tlb_invalidate(pgdir, va);
 	page_remove(pgdir, va);
 	*pgtable_entry = (page2pa(pp) | PERM);
-	pp->ref++;
+	pp->pp_ref++;
 /*
     if (pgtable_entry != 0 && (*pgtable_entry & PTE_V) != 0) {
         if (pa2page(*pgtable_entry) != pp) {
