@@ -128,7 +128,12 @@ env_init(void)
 {
     int i;
     /* Step 1: Initialize env_free_list. */
-
+	LIST_INIT(&env_free_list);
+    
+    for (i = NENV-1; i >= 0; i--) {
+        envs[i].env_status = ENV_FREE;
+        LIST_INSERT_HEAD(&env_free_list, envs + i, env_link);
+    }	
 
     /* Step 2: Traverse the elements of 'envs' array,
      *   set their status as free and insert them into the env_free_list.
@@ -401,7 +406,7 @@ env_destroy(struct Env *e)
     /* Hint: schedule to run a new environment. */
     if (curenv == e) {
         curenv = NULL;
-        /* Hint: Why this? */
+        / Hint: Why this? */
         bcopy((void *)KERNEL_SP - sizeof(struct Trapframe),
               (void *)TIMESTACK - sizeof(struct Trapframe),
               sizeof(struct Trapframe));
