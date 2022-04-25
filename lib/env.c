@@ -185,7 +185,7 @@ env_setup_vm(struct Env *e)
     /* Step 3: Copy kernel's boot_pgdir to pgdir. */
 	for ( ; i < 1024; i++) {
         if (i != PDX(UVPT)) {
-            pgdir[i] = boot_pgidr[i];
+            pgdir[i] = boot_pgdir[i];
         }
     }
     /* Hint:
@@ -195,7 +195,7 @@ env_setup_vm(struct Env *e)
      *  Can you use boot_pgdir as a template?
      */
 	e->env_pgdir = pgdir;
-    e->env_cr3 = (PADDR)pgdir;
+    e->env_cr3 = PADDR(pgdir);
 
     /* UVPT maps the env's own page table, with read-only permission.*/
     e->env_pgdir[PDX(UVPT)]  = e->env_cr3 | PTE_V;
@@ -317,6 +317,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         if (r = page_alloc(&p)) {
             return r;
         }
+		p->pp_ref++;
         page_insert(env->env_pgdir, p, va + i, perm);
         i += BY2PG;
     }
@@ -460,7 +461,7 @@ env_destroy(struct Env *e)
     /* Hint: schedule to run a new environment. */
     if (curenv == e) {
         curenv = NULL;
-        / Hint: Why this? */
+        /* Hint: Why this? */
         bcopy((void *)KERNEL_SP - sizeof(struct Trapframe),
               (void *)TIMESTACK - sizeof(struct Trapframe),
               sizeof(struct Trapframe));
@@ -491,13 +492,18 @@ env_run(struct Env *e)
     /* Hint: if there is an environment running, 
      *   you should switch the context and save the registers. 
      *   You can imitate env_destroy() 's behaviors.*/
-
+	struct Trapframe *old;
+	old = (struct Trapframe *)(TIMESTACK - sizeof(struct Trapframe));
+	if (curenv != NULL && curenv != e) {
+    	curenv -> env_tf = *old;
+    	curenv -> env_tf.pc = curenv -> env_tf.cp0_epc;
+	}
 
     /* Step 2: Set 'curenv' to the new environment. */
-
+	curenv = e;
 
     /* Step 3: Use lcontext() to switch to its address space. */
-
+	lcontext((int)e->env_pgdir);
 
     /* Step 4: Use env_pop_tf() to restore the environment's
      *   environment   registers and return to user mode.
@@ -505,7 +511,7 @@ env_run(struct Env *e)
      * Hint: You should use GET_ENV_ASID there. Think why?
      *   (read <see mips run linux>, page 135-144)
      */
-
+	env_pop_tf(&(e->env_tf), GET_ENV_ASID(e->env_id));
 }
 
 void env_check()
