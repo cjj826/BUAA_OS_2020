@@ -93,7 +93,7 @@ int envid2env(u_int envid, struct Env **penv, int checkperm)
     /* Hint: If envid is zero, return curenv.*/
     /* Step 1: Assign value to e using envid. */
 	if (envid == 0) {
-		e = curenv;
+		*penv = curenv;
 		return 0;
 	} else {
 		e = &envs[ENVX(envid)];
@@ -290,7 +290,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 	if (bin == NULL) return -1;
 
 	u_long perm = PTE_R;
-
+	/*
 	if (offset) {
         size = BY2PG - offset;
         if (r = page_alloc(&p)) {
@@ -300,9 +300,9 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
        	page_insert(env->env_pgdir, p, va - offset, perm);
         bcopy((void *)bin, (void *)(page2kva(p) + offset), MIN(bin_size, size));
     }
-    /* Step 1: load all content of bin into memory. */
+   
     for (i = size; i < bin_size; i += BY2PG) {
-        /* Hint: You should alloc a page.*/
+        
         if (r = page_alloc(&p)) {
             return r;
         }
@@ -311,8 +311,6 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         bcopy((void *)(bin + i), (void *)(page2kva(p)), MIN(bin_size - i, BY2PG));
     }
 
-    /* Step 2: alloc pages to reach `sgsize` when `bin_size` < `sgsize`. 
-     * hint: variable `i` has the value of `bin_size` now! */
     while (i < sgsize) {
         if (r = page_alloc(&p)) {
             return r;
@@ -321,7 +319,61 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         page_insert(env->env_pgdir, p, va + i, perm);
         i += BY2PG;
     }
+    */
+	if (offset) {
+        size = MIN(bin_size, (BY2PG - offset));
+        p = page_lookup(env->env_pgdir, va + i, NULL);
+        if (p == 0) {
+            if (r = page_alloc(&p)) {
+           		return r;
+       	 	}
+            page_insert(env->env_pgdir, p, va + i, perm);
+        }
+        bcopy((void *)bin, (void *)(page2kva(p) + offset), size);
+        i += size;
+    }
     
+    for ( ; i < bin_size; i += size) {
+        /* Hint: You should alloc a page.*/
+        size = MIN(bin_size - i, BY2PG);
+        p = page_lookup(env->env_pgdir, va + i, NULL);
+        if (p == 0) {
+            if (r = page_alloc(&p)) {
+           		return r;
+       	 	}
+            page_insert(env->env_pgdir, p, va + i, perm);
+        }
+        bcopy((void *)(bin + i), (void *)(page2kva(p)), size);
+    }
+    
+    offset = i - ROUNDDOWN(i, BY2PG);
+    if (offset) {
+        size = MIN(BY2PG - offset, sgsize - i);
+        p = page_lookup(env->env_pgdir, va + i, NULL);
+        if (p == 0) {
+            if (r = page_alloc(&p)) {
+           		return r;
+       	 	}
+            page_insert(env->env_pgdir, p, va + i, perm);
+            bcopy((void *)(bin + i - offset), (void *)(page2kva(p)), offset);
+        }
+        bzero((void *)(page2kva(p) + offset), size);
+     	i += size;   
+    }
+    
+    while (i < sgsize) {
+        size = MIN(BY2PG, sgsize - i);
+        p = page_lookup(env->env_pgdir, va + i, NULL);
+        if (p == 0) {
+            if (r = page_alloc(&p)) {
+           		return r;
+       	 	}
+            page_insert(env->env_pgdir, p, va + i, perm);
+        }
+        bzero((void *)page2kva(p), size);
+        i += size;
+    }
+	
     return 0;
 }
 /* Overview:

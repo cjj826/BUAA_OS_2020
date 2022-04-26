@@ -215,7 +215,7 @@ void page_init(void)
 	
 	/* Step 4: Mark the other memory as free. */
 	for (p = pa2page(PADDR(freemem)); page2ppn(p) < npage; p++) {
-		if (page2kva(p) == 0x82000000) {
+		if (p == pa2page(PADDR(TIMESTACK) - 1)) {
 			p->pp_ref = 1;
 		} else {
 			p->pp_ref = 0;
