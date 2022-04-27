@@ -282,7 +282,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 {
     struct Env *env = (struct Env *)user_data;
     struct Page *p = NULL;
-    u_long i;
+    u_long i = 0;
     int r;
     u_long offset = va - ROUNDDOWN(va, BY2PG);
 	long size = 0;
@@ -290,7 +290,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 	if (bin == NULL) return -1;
 
 	u_long perm = PTE_R;
-	/*
+/*	
 	if (offset) {
         size = BY2PG - offset;
         if (r = page_alloc(&p)) {
@@ -319,7 +319,8 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         page_insert(env->env_pgdir, p, va + i, perm);
         i += BY2PG;
     }
-    */
+    
+*/
 	if (offset) {
         size = MIN(bin_size, (BY2PG - offset));
         p = page_lookup(env->env_pgdir, va + i, NULL);
@@ -334,7 +335,6 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
     }
     
     for ( ; i < bin_size; i += size) {
-        /* Hint: You should alloc a page.*/
         size = MIN(bin_size - i, BY2PG);
         p = page_lookup(env->env_pgdir, va + i, NULL);
         if (p == 0) {
@@ -346,6 +346,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         bcopy((void *)(bin + i), (void *)(page2kva(p)), size);
     }
     
+	//	offset = i - ROUNDDOWN(i, BY2PG);
     offset = va + i - ROUNDDOWN((va + i), BY2PG);//
     if (offset) {
         size = MIN(BY2PG - offset, sgsize - i);
