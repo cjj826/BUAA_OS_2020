@@ -351,13 +351,13 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
     if (offset) {
         size = MIN(BY2PG - offset, sgsize - i);
         p = page_lookup(env->env_pgdir, va + i, NULL);
-        if (p == 0) {
+       /* if (p == 0) {
             if (r = page_alloc(&p)) {
            		return r;
        	 	}
             page_insert(env->env_pgdir, p, va + i, perm);
             bcopy((void *)(bin + i - offset), (void *)(page2kva(p)), offset);
-        }
+        } */
         bzero((void *)(page2kva(p) + offset), size);
      	i += size;   
     }
