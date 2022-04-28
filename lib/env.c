@@ -15,11 +15,79 @@ struct Env *curenv = NULL;            // the current env
 static struct Env_list env_free_list;    // Free list
 struct Env_list env_sched_list[2];      // Runnable list
  
+static struct Env_list env_wait_list[3]; // wait list
+
 extern Pde *boot_pgdir;
 extern char *KERNEL_SP;
 
 static u_int asid_bitmap[2] = {0}; // 64
+int S[3];
 
+void S_init(int s, int num) {
+	S[s] = num; 
+}
+
+
+int P(struct Env* e, int s) {
+	if (e->flag != 0) {
+		return -1;
+	} else {
+	//	printf("%d\n",S[s]);
+		if (S[s] == 0)	 {
+			LIST_INSERT_TAIL(&env_wait_list[s], e, env_link);
+			e->flag = s;
+		} else  {
+			S[s]--;
+			e->count[s]++;
+		}
+	}
+	return 0;
+}
+
+int V(struct Env* e, int s) {
+	e->count[s] = (e->count[s] > 0) ? e->count[s] - 1 : e->count[s];
+	if (e->flag != 0) {
+		return -1;
+	}
+	if (LIST_EMPTY(env_wait_list + s)) {
+        S[s]++;
+        return 0;
+    }
+
+    /* Step 2: Call a certain function (has been completed just now) to init kernel memory layout for this new Env.
+     *The function mainly maps the kernel address to this new Env address. */
+    struct Env *now = LIST_FIRST(env_wait_list + s);
+
+    /* Step 3: Initialize every field of new Env with appropriate values.*/
+    now->flag = 0;
+	now->count[s]++;
+
+    /* Step 5: Remove the new Env from env_free_list. */
+    LIST_REMOVE(now, env_link);
+	return 0;
+}
+
+int get_status(struct Env* e) {
+	//printf("flag is %d\n", e->flag);
+	if (e->flag != 0) {
+		return 1;
+	} else if (e->count[1] || e->count[2]) {
+		return 2;
+	} 
+	return 3;
+}
+
+int my_env_create() {
+	struct Env *e;
+	env_alloc(&e, 0);
+	return e->env_id;
+}
+/*
+void
+env_create_priority(u_char *binary, int size, int priority)
+{
+    struct Env *e;
+   */
 
 /* Overview:
  *  This function is to allocate an unused ASID
@@ -136,9 +204,14 @@ env_init(void)
     int i;
     /* Step 1: Initialize env_free_list. */
 	LIST_INIT(&env_free_list);
+	LIST_INIT(env_wait_list + 1);
+	LIST_INIT(env_wait_list + 2);
 	LIST_INIT(env_sched_list);
 	LIST_INIT(env_sched_list + 1);    
     for (i = NENV-1; i >= 0; i--) {
+		envs[i].flag = 0;
+		envs[i].count[1] = 0;
+		envs[i].count[2] = 0;
         envs[i].env_status = ENV_FREE;
         LIST_INSERT_HEAD(&env_free_list, envs + i, env_link);
     }	
