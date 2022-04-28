@@ -20,7 +20,7 @@ extern char *KERNEL_SP;
 
 static u_int asid_bitmap[2] = {0}; // 64
 
-
+u_int ASID;
 /* Overview:
  *  This function is to allocate an unused ASID
  *
@@ -41,7 +41,8 @@ static u_int asid_alloc() {
             return i;
         }
     }
-    panic("too many processes!");
+	return -1;
+   // panic("too many processes!");
 }
 
 /* Overview:
@@ -66,12 +67,22 @@ static void asid_free(u_int i) {
  * Post-Condition:
  *  return e's envid on success
  */
+/*
 u_int mkenvid(struct Env *e) {
     u_int idx = e - envs;
     u_int asid = asid_alloc();
     return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
 }
+*/
+u_int mkenvid(struct Env *e)
+{
+    /*Hint: lower bits of envid hold e's position in the envs array. */
+    u_int idx = (u_int)e - (u_int)envs;
+    idx /= sizeof(struct Env);
 
+    /*Hint: avoid envid being zero. */
+    return (1 << (LOG2NENV)) | idx;  //LOG2NENV=10
+}
 /* Overview:
  *  Convert an envid to an env pointer.
  *  If envid is 0 , set *penv = curenv; otherwise set *penv = envs[ENVX(envid)];
@@ -135,10 +146,14 @@ env_init(void)
 {
     int i;
     /* Step 1: Initialize env_free_list. */
+	ASID = 0x4;
+	asid_bitmap[0] = 0;
+	asid_bitmap[1] = 0;
 	LIST_INIT(&env_free_list);
 	LIST_INIT(env_sched_list);
 	LIST_INIT(env_sched_list + 1);    
     for (i = NENV-1; i >= 0; i--) {
+		envs[i].env_asid = 0;
         envs[i].env_status = ENV_FREE;
         LIST_INSERT_HEAD(&env_free_list, envs + i, env_link);
     }	
@@ -151,7 +166,44 @@ env_init(void)
 
 
 }
+u_int exam_env_run(struct Env *e) {
+	u_int asid = e->env_asid >> 6;
+	u_int change = 0;
+	u_int hard_asid = 0;
+	if (asid == ASID) {
+		return 0;
+	} else {
+		hard_asid = e->env_asid & 0x3f;
+		u_int index = hard_asid >> 5;
+    	u_int inner = hard_asid & 31;
+    	u_int flag = asid_bitmap[index] & (1 << inner);
+		//printf("flag is %d\n", flag);
+		if (flag != 0) {
+			u_int has = asid_alloc();
+			if (has != -1) {
+				hard_asid = has;
+			} else {
+				ASID++;
+				change = 1;
+				//printf("change\n");
+				asid_bitmap[0] = 0;
+    			asid_bitmap[1] = 0;
+				hard_asid = asid_alloc();
+			}
+		}
+		asid_bitmap[index] |= (1 << inner);
+		e->env_asid = (ASID << 6) | hard_asid;
+	}	
+	return change;
+}
 
+void exam_env_free(struct Env *e) {
+	u_int asid = e->env_asid >> 6;
+	u_int hard_asid = e->env_asid & 0x3f;
+	if (asid == ASID) {
+		asid_free(hard_asid);
+	}
+}
 
 /* Overview:
  *  Initialize the kernel virtual memory layout for 'e'.

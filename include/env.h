@@ -28,6 +28,7 @@ struct Env {
 	u_int env_cr3;
 	LIST_ENTRY(Env) env_sched_link;
         u_int env_pri;
+	u_int env_asid;
 	// Lab 4 IPC
 	u_int env_ipc_value;            // data value sent to us 
 	u_int env_ipc_from;             // envid of the sender  
@@ -55,6 +56,9 @@ void env_free(struct Env *);
 void env_create_priority(u_char *binary, int size, int priority);
 void env_create(u_char *binary, int size);
 void env_destroy(struct Env *e);
+
+u_int exam_env_run(struct Env *e);
+void exam_env_free(struct Env *e);
 
 int envid2env(u_int envid, struct Env **penv, int checkperm);
 void env_run(struct Env *e);
