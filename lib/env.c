@@ -200,6 +200,9 @@ u_int exam_env_run(struct Env *e) {
 void exam_env_free(struct Env *e) {
 	u_int asid = e->env_asid >> 6;
 	u_int hard_asid = e->env_asid & 0x3f;
+	if (asid == 0) {
+		return;
+	}
 	if (asid == ASID) {
 		asid_free(hard_asid);
 	}
