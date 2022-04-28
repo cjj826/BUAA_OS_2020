@@ -45,10 +45,11 @@ int P(struct Env* e, int s) {
 }
 
 int V(struct Env* e, int s) {
-	e->count[s] = (e->count[s] > 0) ? e->count[s] - 1 : e->count[s];
+//	e->count[s] = (e->count[s] > 0) ? e->count[s] - 1 : e->count[s];
 	if (e->flag != 0) {
 		return -1;
 	}
+	e->count[s] = (e->count[s] > 0) ? e->count[s] - 1 : e->count[s];
 	if (LIST_EMPTY(env_wait_list + s)) {
         S[s]++;
         return 0;
@@ -71,15 +72,17 @@ int get_status(struct Env* e) {
 	//printf("flag is %d\n", e->flag);
 	if (e->flag != 0) {
 		return 1;
-	} else if (e->count[1] || e->count[2]) {
+	} else if (e->count[1] != 0 || e->count[2] != 0) {
 		return 2;
-	} 
-	return 3;
+	} else {
+		return 3;
+	}
 }
 
 int my_env_create() {
 	struct Env *e;
-	env_alloc(&e, 0);
+	int r = env_alloc(&e, 0);
+	if (r) return -1;
 	return e->env_id;
 }
 /*
