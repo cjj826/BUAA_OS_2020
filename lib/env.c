@@ -20,7 +20,7 @@ extern char *KERNEL_SP;
 
 static u_int asid_bitmap[2] = {0}; // 64
 
-u_int ASID;
+u_int ASID = 0x4;
 /* Overview:
  *  This function is to allocate an unused ASID
  *
@@ -190,8 +190,9 @@ u_int exam_env_run(struct Env *e) {
     			asid_bitmap[1] = 0;
 				hard_asid = asid_alloc();
 			}
+		} else {
+			asid_bitmap[index] |= (1 << inner);
 		}
-		asid_bitmap[index] |= (1 << inner);
 		e->env_asid = (ASID << 6) | hard_asid;
 	}	
 	return change;
@@ -204,7 +205,12 @@ void exam_env_free(struct Env *e) {
 		return;
 	}
 	if (asid == ASID) {
-		asid_free(hard_asid);
+		u_int index = hard_asid >> 5;
+        u_int inner = hard_asid & 31;
+		u_int flag = asid_bitmap[index] & (1 << inner);
+		if (flag != 0) {
+			asid_free(hard_asid);
+		}
 	}
 }
 
