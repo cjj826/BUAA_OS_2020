@@ -290,13 +290,13 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 	if (bin == NULL) return -1;
 
 	u_long perm = PTE_R;
-/*	
+//	
 	if (offset) {
         size = BY2PG - offset;
         if (r = page_alloc(&p)) {
             return r;
         }
-        p->pp_ref++;
+        //p->pp_ref++;
        	page_insert(env->env_pgdir, p, va - offset, perm);
         bcopy((void *)bin, (void *)(page2kva(p) + offset), MIN(bin_size, size));
     }
@@ -306,7 +306,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         if (r = page_alloc(&p)) {
             return r;
         }
-        p->pp_ref++;
+        //p->pp_ref++;
         page_insert(env->env_pgdir, p, va + i, perm);
         bcopy((void *)(bin + i), (void *)(page2kva(p)), MIN(bin_size - i, BY2PG));
     }
@@ -315,12 +315,12 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         if (r = page_alloc(&p)) {
             return r;
         }
-		p->pp_ref++;
+		//p->pp_ref++;
         page_insert(env->env_pgdir, p, va + i, perm);
         i += BY2PG;
     }
     
-*/
+/*
 	if (offset) {
         size = MIN(bin_size, (BY2PG - offset));
         p = page_lookup(env->env_pgdir, va + i, NULL);
@@ -351,13 +351,13 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
     if (offset) {
         size = MIN(BY2PG - offset, sgsize - i);
         p = page_lookup(env->env_pgdir, va + i, NULL);
-       /* if (p == 0) {
+        if (p == 0) {
             if (r = page_alloc(&p)) {
            		return r;
        	 	}
             page_insert(env->env_pgdir, p, va + i, perm);
-            bcopy((void *)(bin + i - offset), (void *)(page2kva(p)), offset);
-        } */
+            //bcopy((void *)(bin + i - offset), (void *)(page2kva(p)), offset);
+        } 
         bzero((void *)(page2kva(p) + offset), size);
      	i += size;   
     }
@@ -374,7 +374,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         bzero((void *)page2kva(p), size);
         i += size;
     }
-	
+*/	
     return 0;
 }
 /* Overview:
