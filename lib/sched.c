@@ -64,13 +64,13 @@
      *  LIST_INSERT_TAIL, LIST_REMOVE, LIST_FIRST, LIST_EMPTY
      */
 //}
-/*
+
 void sched_yield(void)
 {
 
     static int count = 0; // remaining time slices of current env
     static int point = 0; // current env_sched_list index
-    struct Env* now;
+   // struct Env* now;
     static struct Env* e = NULL;
 
     if (count == 0 || e == NULL || e->env_status != ENV_RUNNABLE) {
@@ -83,10 +83,9 @@ void sched_yield(void)
         if (LIST_EMPTY(env_sched_list + point)) {
             point = 1 - point;
         }
-        LIST_FOREACH(now, env_sched_list + point, env_sched_link) {
-            if (now->env_status == ENV_RUNNABLE) {
-                count = now->env_pri;
-                e = now;
+        LIST_FOREACH(e, env_sched_list + point, env_sched_link) {
+            if (e->env_status == ENV_RUNNABLE) {
+                count = e->env_pri;
                 break;
             }
         }
@@ -96,8 +95,8 @@ void sched_yield(void)
 
 //panic("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 }
-*/
 
+/*
 void sched_yield(void)
 {
 
@@ -142,4 +141,4 @@ void sched_yield(void)
     count --;
     env_run(e);
     //env_run(LIST_FIRST(&env_sched_list[0]));
-}
+}*/
