@@ -277,7 +277,7 @@ env_alloc(struct Env **new, u_int parent_id)
  *   return 0 on success, otherwise < 0.
  */
 /*** exercise 3.6 ***/
-static int load_icode_mapper(u_long va, u_int32_t sgsize,
+/*static int load_icode_mapper(u_long va, u_int32_t sgsize,
                              u_char *bin, u_int32_t bin_size, void *user_data)
 {
     struct Env *env = (struct Env *)user_data;
@@ -320,7 +320,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         i += BY2PG;
     }
     
-/*
+////
 	if (offset) {
         size = MIN(bin_size, (BY2PG - offset));
         p = page_lookup(env->env_pgdir, va + i, NULL);
@@ -374,7 +374,61 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         bzero((void *)page2kva(p), size);
         i += size;
     }
-*/	
+///	
+    return 0;
+}*/
+static int load_icode_mapper(u_long va, u_int32_t sgsize,
+                             u_char *bin, u_int32_t bin_size, void *user_data)
+{
+    struct Env *env = (struct Env *)user_data;
+    struct Page *p = NULL;
+    u_long i = 0;
+    int r;
+    u_long offset = va - ROUNDDOWN(va, BY2PG);
+    long size = 0;
+
+    if (bin == NULL) return -1;
+
+    u_long perm = PTE_R;
+    
+    if (offset) {
+        p = page_lookup(env->env_pgdir, va + i, NULL);
+        if (p == 0) {
+            if (r = page_alloc(&p)) {
+                return r;
+            }
+            if (r = page_insert(env->env_pgdir, p, va + i, perm)) {
+                return r;
+            }
+        }
+        size = MIN(bin_size, BY2PG - offset);
+        if (r = page_alloc(&p)) {
+            return r;
+        }
+        page_insert(env->env_pgdir, p, va - offset, perm);
+        bcopy((void *)bin, (void *)(page2kva(p) + offset), size);
+    }
+
+    for (i = size; i < bin_size; i += BY2PG) {
+
+        if (r = page_alloc(&p)) {
+            return r;
+        }
+        if (r = page_insert(env->env_pgdir, p, va + i, perm)) {
+            return r;
+        }
+        size = MIN(bin_size - i, BY2PG);
+        bcopy((void *)(bin + i), (void *)(page2kva(p)), size);
+    }
+    while (i < sgsize) {
+        if (r = page_alloc(&p)) {
+            return r;
+        }
+        if (r = page_insert(env->env_pgdir, p, va + i, perm)) {
+            return r;
+        }
+        i += BY2PG;
+    }
     return 0;
 }
 /* Overview:
