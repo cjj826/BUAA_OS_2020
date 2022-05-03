@@ -90,8 +90,12 @@ void sched_yield(void)
             }
         }
     }
-    count--;
-    env_run(e);
+ //   count--;
+	if (e != NULL) {
+		count--;
+		env_run(e);
+	}
+ //   env_run(e);
 
 //panic("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 }
