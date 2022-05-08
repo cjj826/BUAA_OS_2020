@@ -140,6 +140,8 @@ void sched_yield(void)
     	}
 	
 	count --;
-    env_run(e);
+	if (e != NULL) {
+		env_run(e);
+	}
     //env_run(LIST_FIRST(&env_sched_list[0]));
 }
