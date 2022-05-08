@@ -381,6 +381,7 @@ env_alloc(struct Env **new, u_int parent_id)
 ///	
     return 0;
 }*/
+/*
 static int load_icode_mapper(u_long va, u_int32_t sgsize,
                              u_char *bin, u_int32_t bin_size, void *user_data)
 {
@@ -427,6 +428,57 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         if (r = page_insert(env->env_pgdir, p, va + i, perm)) {
             return r;
         }
+        i += BY2PG;
+    }
+    return 0;
+}*/
+static int load_icode_mapper(u_long va, u_int32_t sgsize,
+                             u_char *bin, u_int32_t bin_size, void *user_data)
+{
+    struct Env *env = (struct Env *)user_data;
+    struct Page *p = NULL;
+    u_long i = 0;
+    int r;
+    int size;
+    u_long offset = va - ROUNDDOWN(va, BY2PG);
+
+    if (offset > 0) {
+        p = page_lookup(env->env_pgdir, va + i, NULL);
+        if (p == 0) {
+            if ((r = page_alloc(&p)) < 0) {
+                return r;
+            }
+            if ((r = page_insert(env->env_pgdir, p, va + i, PTE_R)) < 0) {
+                return r;
+            }
+        }
+        size = MIN(BY2PG - offset, bin_size - i);
+        bcopy((void*)bin, (void*)(page2kva(p) + offset), size);
+        i += size;
+    }
+
+    /* Step 1: load all content of bin into memory. */
+    for (; i < bin_size; i += BY2PG) {
+        /* Hint: You should alloc a new page. */
+        if ((r = page_alloc(&p)) < 0) {
+            return r;
+        }
+        if ((r = page_insert(env->env_pgdir, p, va + i, PTE_R)) < 0) {
+            return r;
+        }
+        size = MIN(BY2PG,bin_size - i);
+        bcopy((void*)(bin + i), (void*)page2kva(p), size);
+    }
+    /* Step 2: alloc pages to reach `sgsize` when `bin_size` < `sgsize`.
+     * hint: variable `i` has the value of `bin_size` now! */
+    while (i < sgsize) {
+        if ((r = page_alloc(&p)) < 0) {
+            return r;
+        }
+        if ((r = page_insert(env->env_pgdir, p, va + i, PTE_R)) < 0) {
+            return r;
+        }
+        bzero((void*)page2kva(p), BY2PG);
         i += BY2PG;
     }
     return 0;
