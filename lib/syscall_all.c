@@ -152,7 +152,7 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
         return -E_INVAL;
     }
     //check the perm
-    if ((perm & PTE_COW) && !(perm & PTE_V)) {
+    if ((perm & PTE_COW) || !(perm & PTE_V)) {
         return -E_INVAL;
     }
     if (ret = page_alloc(&ppage)) {
