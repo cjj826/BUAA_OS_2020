@@ -7,7 +7,7 @@
 
 extern char *KERNEL_SP;
 extern struct Env *curenv;
-//extern int time_slices;
+extern int time_slices;
 /* Overview:
  * 	This function is used to print a character on screen.
  *
@@ -70,7 +70,7 @@ void sys_yield(void)
     struct Trapframe *tmp;
     tmp = (struct Trapframe*)(KERNEL_SP - sizeof(struct Trapframe));
     bcopy((void*)tmp, (void*)(TIMESTACK - sizeof(struct Trapframe)), sizeof(struct Trapframe));
-  //  time_slices = 0;
+    time_slices = 0;
     sched_yield();
 }
 
