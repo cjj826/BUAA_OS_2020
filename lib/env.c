@@ -649,7 +649,7 @@ env_run(struct Env *e)
      *   You can imitate env_destroy() 's behaviors.*/
 	struct Trapframe *old;
 	old = (struct Trapframe *)(TIMESTACK - sizeof(struct Trapframe));
-	if (curenv != NULL && curenv != e) {
+	if (curenv != NULL) {
     	//curenv -> env_tf = *old;
 		bcopy((void*)old, (void*)(&(curenv->env_tf)), sizeof(struct Trapframe));
     	curenv -> env_tf.pc = curenv -> env_tf.cp0_epc;
