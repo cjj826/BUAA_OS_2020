@@ -188,11 +188,7 @@ env_setup_vm(struct Env *e)
             pgdir[i] = boot_pgdir[i];
         }
     }
-
-	for (i = PDX(ULIM); i < PTE2PT; i++) {
-        pgdir[i] = 0;
-    }
-    /* Hint:
+      /* Hint:
      *  The VA space of all envs is identical above UTOP
      *  (except at UVPT, which we've set below).
      *  See ./include/mmu.h for layout.
@@ -381,7 +377,6 @@ env_alloc(struct Env **new, u_int parent_id)
 ///	
     return 0;
 }*/
-/*
 static int load_icode_mapper(u_long va, u_int32_t sgsize,
                              u_char *bin, u_int32_t bin_size, void *user_data)
 {
@@ -431,7 +426,8 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         i += BY2PG;
     }
     return 0;
-}*/
+}
+/*
 static int load_icode_mapper(u_long va, u_int32_t sgsize,
                              u_char *bin, u_int32_t bin_size, void *user_data)
 {
@@ -457,9 +453,9 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         i += size;
     }
 
-    /* Step 1: load all content of bin into memory. */
+    // Step 1: load all content of bin into memory. 
     for (; i < bin_size; i += BY2PG) {
-        /* Hint: You should alloc a new page. */
+     
         if ((r = page_alloc(&p)) < 0) {
             return r;
         }
@@ -469,8 +465,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         size = MIN(BY2PG,bin_size - i);
         bcopy((void*)(bin + i), (void*)page2kva(p), size);
     }
-    /* Step 2: alloc pages to reach `sgsize` when `bin_size` < `sgsize`.
-     * hint: variable `i` has the value of `bin_size` now! */
+   
     while (i < sgsize) {
         if ((r = page_alloc(&p)) < 0) {
             return r;
@@ -482,7 +477,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         i += BY2PG;
     }
     return 0;
-}
+}*/
 /* Overview:
  *  Sets up the the initial stack and program binary for a user process.
  *  This function loads the complete binary image by using elf loader,
@@ -652,19 +647,19 @@ env_run(struct Env *e)
     /* Hint: if there is an environment running, 
      *   you should switch the context and save the registers. 
      *   You can imitate env_destroy() 's behaviors.*/
-	/*struct Trapframe *old;
+	struct Trapframe *old;
 	old = (struct Trapframe *)(TIMESTACK - sizeof(struct Trapframe));
 	if (curenv != NULL && curenv != e) {
     	//curenv -> env_tf = *old;
 		bcopy((void*)old, (void*)(&(curenv->env_tf)), sizeof(struct Trapframe));
     	curenv -> env_tf.pc = curenv -> env_tf.cp0_epc;
-	}*/
-	if (curenv) {
+	}
+	/*if (curenv) {
         struct Trapframe *old;
         old = (struct Trapframe*)(TIMESTACK - sizeof(struct Trapframe));
         bcopy((void*)old, (void*)(&(curenv->env_tf)), sizeof(struct Trapframe));
         curenv->env_tf.pc = curenv->env_tf.cp0_epc;
-    }
+    }*/
 
     /* Step 2: Set 'curenv' to the new environment. */
 	curenv = e;
