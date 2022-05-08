@@ -212,9 +212,10 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
         return -E_INVAL;
     }
     //your code here
-	if (ppage = page_lookup(srcenv->env_pgdir, round_srcva, &ppte)) {
-        return -1;
-    }
+	ppage = page_lookup(srcenv->env_pgdir, round_srcva, &ppte);
+	if (ppage == 0) {
+		return -1;
+	}
     if (!((*ppte) & PTE_R) && (perm & PTE_R)) {
         return -E_INVAL;//from non-writable to writable?
     }
