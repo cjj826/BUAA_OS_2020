@@ -64,7 +64,7 @@
      *  LIST_INSERT_TAIL, LIST_REMOVE, LIST_FIRST, LIST_EMPTY
      */
 //}
-
+/*
 void sched_yield(void)
 {
 
@@ -96,7 +96,7 @@ void sched_yield(void)
 //panic("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 }
 
-/*
+*/
 void sched_yield(void)
 {
 
@@ -137,9 +137,8 @@ void sched_yield(void)
             }
         }
     }
-	if (e != NULL) {
-		count --;
-    	env_run(e);
-	}
+	
+	count --;
+    env_run(e);
     //env_run(LIST_FIRST(&env_sched_list[0]));
-}*/
+}
