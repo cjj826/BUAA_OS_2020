@@ -644,6 +644,7 @@ extern void lcontext(u_int contxt);
  *      env_pop_tf , lcontext.
  */
 /*** exercise 3.10 ***/
+
 void
 env_run(struct Env *e)
 {
@@ -651,13 +652,19 @@ env_run(struct Env *e)
     /* Hint: if there is an environment running, 
      *   you should switch the context and save the registers. 
      *   You can imitate env_destroy() 's behaviors.*/
-	struct Trapframe *old;
+	/*struct Trapframe *old;
 	old = (struct Trapframe *)(TIMESTACK - sizeof(struct Trapframe));
 	if (curenv != NULL && curenv != e) {
     	//curenv -> env_tf = *old;
 		bcopy((void*)old, (void*)(&(curenv->env_tf)), sizeof(struct Trapframe));
     	curenv -> env_tf.pc = curenv -> env_tf.cp0_epc;
-	}
+	}*/
+	if (curenv) {
+        struct Trapframe *old;
+        old = (struct Trapframe*)(TIMESTACK - sizeof(struct Trapframe));
+        bcopy((void*)old, (void*)(&(curenv->env_tf)), sizeof(struct Trapframe));
+        curenv->env_tf.pc = curenv->env_tf.cp0_epc;
+    }
 
     /* Step 2: Set 'curenv' to the new environment. */
 	curenv = e;
