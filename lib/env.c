@@ -402,10 +402,10 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
             }
         }
         size = MIN(bin_size, BY2PG - offset);
-        if (r = page_alloc(&p)) {
-            return r;
-        }
-        page_insert(env->env_pgdir, p, va - offset, perm);
+       // if (r = page_alloc(&p)) {
+       //     return r;
+       // }
+       // page_insert(env->env_pgdir, p, va - offset, perm);
         bcopy((void *)bin, (void *)(page2kva(p) + offset), size);
     }
 
