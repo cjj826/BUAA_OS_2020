@@ -7,7 +7,7 @@
 
 extern char *KERNEL_SP;
 extern struct Env *curenv;
-extern int time_slices;
+
 /* Overview:
  * 	This function is used to print a character on screen.
  *
@@ -17,7 +17,7 @@ extern int time_slices;
 void sys_putchar(int sysno, int c, int a2, int a3, int a4, int a5)
 {
 	printcharc((char) c);
-	return;
+	return ;
 }
 
 /* Overview:
@@ -59,18 +59,14 @@ u_int sys_getenvid(void)
  *	This function enables the current process to give up CPU.
  *
  * Post-Condition:
- * 	Deschedule current process. This function will never return.
- *
- * Note:
- *  For convenience, you can just give up the current time slice.
+ * 	Deschedule current environment. This function will never return.
  */
 /*** exercise 4.6 ***/
 void sys_yield(void)
 {
-    struct Trapframe *tmp;
-    tmp = (struct Trapframe*)(KERNEL_SP - sizeof(struct Trapframe));
-    bcopy((void*)tmp, (void*)(TIMESTACK - sizeof(struct Trapframe)), sizeof(struct Trapframe));
-    time_slices = 0;
+	bcopy((void *)KERNEL_SP - sizeof(struct Trapframe),
+              (void *)TIMESTACK - sizeof(struct Trapframe),
+              sizeof(struct Trapframe));
     sched_yield();
 }
 
@@ -107,7 +103,7 @@ int sys_env_destroy(int sysno, u_int envid)
  * 	Set envid's pagefault handler entry point and exception stack.
  *
  * Pre-Condition:
- * 	xstacktop points to one byte past exception stack.
+ * 	xstacktop points one byte past exception stack.
  *
  * Post-Condition:
  * 	The envid's pagefault handler will be set to `func` and its
@@ -141,32 +137,32 @@ int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)
  * Post-Condition:
  * Return 0 on success, < 0 on error
  *	- va must be < UTOP
- *	- env may modify its own address space or the address space of its children 
+ *	- env may modify its own address space or the address space of its children
  */
 /*** exercise 4.3 ***/
 int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 {
-	// Your code here.
-	struct Env *env;
-	struct Page *ppage;
-	int ret;
-	ret = 0;
-    int r;
-
-    if ((perm & PTE_COW) || ((perm & PTE_V) == 0)) {
-        return -E_INVAL;
-    }
+    // Your code here.
+    struct Env *env;
+    struct Page *ppage;
+    int ret;
+    ret = 0;
+    //check the address
     if (va >= UTOP) {
         return -E_INVAL;
     }
-    if ((r = envid2env(envid, &env, 1)) < 0) {
-        return r;
+    //check the perm
+    if ((perm & PTE_COW) || !(perm & PTE_V)) {
+        return -E_INVAL;
     }
-    if ((r = page_alloc(&ppage)) < 0) {
-        return r;
+    if (ret = page_alloc(&ppage)) {
+        return ret;
     }
-    if ((r = page_insert(env->env_pgdir, ppage, va, perm)) < 0) {
-        return r;
+    if (ret = envid2env(envid, &env, 1)) {
+     	return ret;   
+    } //checkperm is 1
+    if (ret = page_insert(env->env_pgdir, ppage, va, perm)) {
+        return ret;
     }
     return 0;
 }
@@ -174,7 +170,7 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 /* Overview:
  * 	Map the page of memory at 'srcva' in srcid's address space
  * at 'dstva' in dstid's address space with permission 'perm'.
- * Perm must have PTE_V to be valid.
+ * Perm has the same restrictions as in sys_mem_alloc.
  * (Probably we should add a restriction that you can't go from
  * non-writable to writable?)
  *
@@ -197,35 +193,37 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 
 	ppage = NULL;
 	ret = 0;
+	if (ret = envid2env(srcid, &srcenv, 0)) {
+     	return ret;   
+    }//checkperm is 0
+    if (ret = envid2env(dstid, &dstenv, 0)) {
+     	return ret;   
+    }//checkperm is 0
+
 	round_srcva = ROUNDDOWN(srcva, BY2PG);
 	round_dstva = ROUNDDOWN(dstva, BY2PG);
 
-    //your code here
+    //check the perm
+    if (!(perm & PTE_V)) {
+        return -E_INVAL;
+    }
+    //check the address
     if (round_srcva >= UTOP || round_dstva >= UTOP) {
         return -E_INVAL;
     }
-    if ((perm & PTE_V) == 0) {
-        return -E_INVAL;
-    }
-    if ((ret = envid2env(srcid, &srcenv, 0)) < 0) {
+    //your code here
+	ppage = page_lookup(srcenv->env_pgdir, round_srcva, &ppte);
+	if (ppage == 0) {
+		return -1;
+	}
+ //   if (!((*ppte) & PTE_R) && (perm & PTE_R)) {
+   //     return -E_INVAL;//from non-writable to writable?
+   // }
+    if (ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm)) {
         return ret;
     }
-    if ((ret = envid2env(dstid, &dstenv, 0)) < 0) {
-        return ret;
-    }
-    ppage = page_lookup(srcenv->env_pgdir, round_srcva, NULL);
-    if (ppage == NULL) {
-        if ((ret = page_alloc(&ppage)) < 0) {
-            return ret;
-        }
-        if ((ret = page_insert(srcenv->env_pgdir, ppage, round_srcva, perm)) < 0) {
-            return ret;
-        }
-    }
-    if ((ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm)) < 0) {
-            return ret;
-        }
-	return ret;
+
+	return 0;
 }
 
 /* Overview:
@@ -241,18 +239,17 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 int sys_mem_unmap(int sysno, u_int envid, u_int va)
 {
 	// Your code here.
-	int ret = 0;
+	int ret;
 	struct Env *env;
+	//check the address
     if (va >= UTOP) {
-        return -E_INVAL;
+        return -1;
     }
-
-    if ((ret = envid2env(envid, &env, 0)) < 0) {
-        return ret;
-    }
+    if (ret = envid2env(envid, &env, 0)) {
+     	return ret;   
+    }//checkperm is 0
     page_remove(env->env_pgdir, va);
-
-	return ret;
+	return 0;
 	//	panic("sys_mem_unmap not implemented");
 }
 
@@ -274,7 +271,7 @@ int sys_env_alloc(void)
 	// Your code here.
 	int r;
 	struct Env *e;
-
+	
 
 	return e->env_id;
 	//	panic("sys_env_alloc not implemented");
@@ -343,7 +340,7 @@ void sys_panic(int sysno, char *msg)
  * message to it.
  *
  * Pre-Condition:
- * 	`dstva` is valid (Note: 0 is also a valid value for `dstva`).
+ * 	`dstva` is valid (Note: NULL is also a valid value for `dstva`).
  *
  * Post-Condition:
  * 	This syscall will set the current process's status to
@@ -352,6 +349,9 @@ void sys_panic(int sysno, char *msg)
 /*** exercise 4.7 ***/
 void sys_ipc_recv(int sysno, u_int dstva)
 {
+	if (dstva >= UTOP) {
+        return;
+    }
     curenv->env_ipc_recving = 1;
     curenv->env_ipc_dstva = dstva;
     curenv->env_status = ENV_NOT_RUNNABLE;
@@ -373,7 +373,7 @@ void sys_ipc_recv(int sysno, u_int dstva)
  * Post-Condition:
  * 	Return 0 on success, < 0 on error.
  *
- * Hint: You need to call `envid2env`.
+ * Hint: the only function you need to call is envid2env.
  */
 /*** exercise 4.7 ***/
 int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
@@ -383,16 +383,29 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	int r;
 	struct Env *e;
 	struct Page *p;
-    envid2env(envid, &e, 0);
-    if (e->env_ipc_recving == 0) {
+	if (srcva >= UTOP) {
         return -E_IPC_NOT_RECV;
     }
-    e->env_ipc_recving = 0;
-    e->env_ipc_value = value;
-    e->env_ipc_from = curenv->env_id;
-    if (srcva != 0) {
-        sys_mem_map(sysno, curenv->env_id, srcva, envid, e->env_ipc_dstva, perm);
+	if (r = envid2env(envid, &e, 0)) {
+        return r;
     }
+    if (!e->env_ipc_recving) {
+        return -E_IPC_NOT_RECV;
+    } 
+    e->env_ipc_recving = 0;
+    e->env_ipc_from = curenv->env_id;
+    e->env_ipc_value = value;
     e->env_status = ENV_RUNNABLE;
+	e->env_ipc_perm = perm;
+   	if (srcva) {
+		p = page_lookup(curenv->env_pgdir, srcva, NULL);
+		if (p == 0) {
+			return -1;
+		}
+		if (r = page_insert(e->env_pgdir, p, e->env_ipc_dstva, perm)) {
+			return r;
+		}
+	}
 	return 0;
 }
+

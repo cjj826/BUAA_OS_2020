@@ -97,7 +97,7 @@ void sched_yield(void)
 }
 
 */
-/*
+
 void sched_yield(void)
 {
 
@@ -144,7 +144,8 @@ void sched_yield(void)
 		env_run(e);
 	}
     //env_run(LIST_FIRST(&env_sched_list[0]));
-}*/
+}
+/*
 int time_slices = 0;
 void sched_yield(void)
 {
@@ -180,4 +181,4 @@ void sched_yield(void)
 	}
 	time_slices--;
 	env_run(curenv);
-}
+}*/
