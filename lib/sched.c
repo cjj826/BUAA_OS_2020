@@ -116,11 +116,11 @@ void sched_yield(void)
     // *  LIST_INSERT_TAIL, LIST_REMOVE, LIST_FIRST, LIST_EMPTY
  
         if(count == 0 || e == NULL || e->env_status != ENV_RUNNABLE){
-        if(e != NULL){//count == 0 || status is not runnable
-            LIST_REMOVE(e, env_sched_link);
-            if(e->env_status != ENV_FREE){
-                LIST_INSERT_TAIL(&env_sched_list[1-point], e, env_sched_link);
-            }
+	        if(e != NULL){//count == 0 || status is not runnable
+    	        LIST_REMOVE(e, env_sched_link);
+        	    if(e->env_status != ENV_FREE){
+            	    LIST_INSERT_TAIL(&env_sched_list[1-point], e, env_sched_link);
+            	}
         }
         while(1){
             while(LIST_EMPTY(&env_sched_list[point]))
@@ -137,8 +137,9 @@ void sched_yield(void)
             }
         }
     }
-	
-    count --;
-    env_run(e);
+	if (e != NULL) {
+		count --;
+    	env_run(e);
+	}
     //env_run(LIST_FIRST(&env_sched_list[0]));
 }
