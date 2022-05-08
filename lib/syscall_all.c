@@ -204,7 +204,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	round_dstva = ROUNDDOWN(dstva, BY2PG);
 
     //check the perm
-    if ((perm & PTE_COW) && !(perm & PTE_V)) {
+    if (!(perm & PTE_V)) {
         return -E_INVAL;
     }
     //check the address
