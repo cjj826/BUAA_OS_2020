@@ -153,15 +153,15 @@
 
 .macro get_sp
 	mfc0	k1, CP0_CAUSE
-	andi	k1, 0x107C
+	andi	k1, 0x107C //focus on CAUSE's 2-6, 12.
 	xori	k1, 0x1000
-	bnez	k1, 1f
+	bnez	k1, 1f // if 12 is zero, or 2-6 has 1, save KERNEL_SP to sp, else save TIMESTACK to sp
 	nop
 	li	sp, 0x82000000
 	j	2f
 	nop
 1:
-	bltz	sp, 2f
+	bltz	sp, 2f // if 12 is zero, do nothing
 	nop
 	lw	sp, KERNEL_SP
 	nop
