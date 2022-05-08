@@ -198,7 +198,7 @@ env_setup_vm(struct Env *e)
      *  (except at UVPT, which we've set below).
      *  See ./include/mmu.h for layout.
      *  Can you use boot_pgdir as a template?
-     */i 
+     */ 
 
     /* UVPT maps the env's own page table, with read-only permission.*/
     e->env_pgdir[PDX(UVPT)]  = e->env_cr3 | PTE_V;
