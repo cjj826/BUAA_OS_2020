@@ -134,11 +134,15 @@ duppage(u_int envid, u_int pn)
 	u_int perm;
 	addr = pn * BY2PG;
     perm = (*vpt)[pn] & 0xfff;//low 12
-    if (!(perm & PTE_LIBRARY) && (perm & PTE_R) && (perm & PTE_V) && !(perm & PTE_COW)) {
+	int flag = 0;
+    if (!(perm & PTE_LIBRARY) && (perm & PTE_R)) {
     	perm = perm | PTE_COW;
-		syscall_mem_map(0, addr, 0, addr, perm);//change father, too
+		flag = 1;
+		//syscall_mem_map(0, addr, 0, addr, perm);//change father, too
 	}
     syscall_mem_map(0, addr, envid, addr, perm);
+	if (flag)
+		syscall_mem_map(0, addr, 0, addr, perm);
 	//	user_panic("duppage not implemented");
 }
 
