@@ -402,15 +402,10 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
             }
         }
         size = MIN(bin_size, BY2PG - offset);
-        if (r = page_alloc(&p)) {
-            return r;
-        }
-        page_insert(env->env_pgdir, p, va - offset, perm);
         bcopy((void *)bin, (void *)(page2kva(p) + offset), size);
     }
 
     for (i = size; i < bin_size; i += BY2PG) {
-
         if (r = page_alloc(&p)) {
             return r;
         }
@@ -601,8 +596,9 @@ env_run(struct Env *e)
      *   You can imitate env_destroy() 's behaviors.*/
 	struct Trapframe *old;
 	old = (struct Trapframe *)(TIMESTACK - sizeof(struct Trapframe));
-	if (curenv != NULL && curenv != e) {
-    	curenv -> env_tf = *old;
+	if (curenv != NULL) {
+    	//curenv -> env_tf = *old;
+		bcopy((void*)old, (void*)(&(curenv->env_tf)), sizeof(struct Trapframe));
     	curenv -> env_tf.pc = curenv -> env_tf.cp0_epc;
 	}
 
