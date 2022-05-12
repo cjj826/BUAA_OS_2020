@@ -29,6 +29,54 @@ nop
 	END(handle_\exception)
 .endm
 
+NESTED(handle_AdEL, TF_SIZE, sp)
+nop
+.set noat
+nop
+SAVE_ALL
+CLI
+.set at
+
+mfc0 k0, CP0_EPC
+
+lw k0, 0(k0)
+srl k1, k0, 26
+andi k1, k1, 2
+#li t1, 0x08000000
+#and k1, t1
+bnez k1, W
+nop
+li k1, 32
+nop
+j end
+W:
+	li k1, 33
+	nop 
+
+end:	
+sll k1, k1, 26
+sll k0, k0, 6
+srl k0, k0 6
+#li t1, 0x03ffffff
+#and k0, t1
+add k0, k0, k1
+mfc0 k1, CP0_EPC
+sw k0, 0(k1)
+j ret_from_exception
+nop
+#RESTORE_SOME
+#move k0, t0
+#lw sp, TF_REG29(sp)
+#li t1, 0x1
+#or t0, t0, t1
+#mtc0 t0, CP0_STATUS
+#jr k0
+#rfe
+#nop
+END(handle_AdEL)
+
+
+
 FEXPORT(ret_from_exception)
 	.set noat
 	.set noreorder
