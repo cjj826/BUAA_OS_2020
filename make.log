@@ -1,0 +1,42 @@
+make --directory=boot
+make[1]: Entering directory '/home/git/20373021/boot'
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I../include/ -c start.S 
+make[1]: Leaving directory '/home/git/20373021/boot'
+make --directory=drivers
+make[1]: Entering directory '/home/git/20373021/drivers'
+make --directory=gxconsole
+make[2]: Entering directory '/home/git/20373021/drivers/gxconsole'
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000   -c -o console.o console.c
+make[2]: Leaving directory '/home/git/20373021/drivers/gxconsole'
+make[1]: Leaving directory '/home/git/20373021/drivers'
+make --directory=init
+make[1]: Entering directory '/home/git/20373021/init'
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I../include -c init.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I../include -c main.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I../include -c code_a.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I../include -c code_b.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I../include -c check_icode.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I../include -c test.S
+make[1]: Leaving directory '/home/git/20373021/init'
+make --directory=lib
+make[1]: Entering directory '/home/git/20373021/lib'
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c kernel_elfloader.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c env.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c print.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c printf.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c sched.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c env_asm.S
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c kclock.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c traps.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c genex.S
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c kclock_asm.S
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c syscall.S
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c syscall_all.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c getc.S
+make[1]: Leaving directory '/home/git/20373021/lib'
+make --directory=mm
+make[1]: Entering directory '/home/git/20373021/mm'
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c pmap.c
+/OSLAB/compiler/usr/bin/mips_4KC-gcc -O -G 0 -mno-abicalls -fno-builtin -Wa,-xgot -Wall -fPIC -march=r3000 -I./ -I../ -I../include/ -c tlb_asm.S
+make[1]: Leaving directory '/home/git/20373021/mm'
+/OSLAB/compiler/usr/bin/mips_4KC-ld -o gxemul/vmlinux -N -T tools/scse0_3.lds boot/start.o init/*.o drivers/gxconsole/console.o lib/*.o mm/*.o

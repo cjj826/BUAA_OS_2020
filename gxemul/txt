@@ -1,0 +1,172 @@
+
+Symbol table '.symtab' contains 169 entries:
+   Num:    Value  Size Type    Bind   Vis      Ndx Name
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 80000080     0 SECTION LOCAL  DEFAULT    1 
+     2: 80010000     0 SECTION LOCAL  DEFAULT    2 
+     3: 80015d40     0 SECTION LOCAL  DEFAULT    3 
+     4: 80015d60     0 SECTION LOCAL  DEFAULT    4 
+     5: 80016040     0 SECTION LOCAL  DEFAULT    5 
+     6: 80016f60     0 SECTION LOCAL  DEFAULT    6 
+     7: 80017020     0 SECTION LOCAL  DEFAULT    7 
+     8: 80017040     0 SECTION LOCAL  DEFAULT    8 
+     9: 80025310     0 SECTION LOCAL  DEFAULT    9 
+    10: 00000000     0 SECTION LOCAL  DEFAULT   10 
+    11: 00000000     0 SECTION LOCAL  DEFAULT   11 
+    12: 00000000     0 SECTION LOCAL  DEFAULT   12 
+    13: 00000000     0 SECTION LOCAL  DEFAULT   13 
+    14: 00000000     0 SECTION LOCAL  DEFAULT   14 
+    15: 00000000     0 SECTION LOCAL  DEFAULT   15 
+    16: 00000000     0 FILE    LOCAL  DEFAULT  ABS start.S
+    17: 80025310     0 NOTYPE  LOCAL  DEFAULT    9 KERNEL_STACK
+    18: 80010040     0 NOTYPE  LOCAL  DEFAULT    2 loop
+    19: 00000000     0 FILE    LOCAL  DEFAULT  ABS check_icode.c
+    20: 00000000     0 FILE    LOCAL  DEFAULT  ABS code_a.c
+    21: 00000000     0 FILE    LOCAL  DEFAULT  ABS code_b.c
+    22: 00000000     0 FILE    LOCAL  DEFAULT  ABS init.c
+    23: 80015d60   100 OBJECT  LOCAL  DEFAULT    4 C.7.921
+    24: 00000000     0 FILE    LOCAL  DEFAULT  ABS main.c
+    25: 00000000     0 FILE    LOCAL  DEFAULT  ABS test.S
+    26: 00000000     0 FILE    LOCAL  DEFAULT  ABS console.c
+    27: 00000000     0 FILE    LOCAL  DEFAULT  ABS env.c
+    28: 80016f68     8 OBJECT  LOCAL  DEFAULT    6 asid_bitmap
+    29: 800102f0   136 FUNC    LOCAL  DEFAULT    2 asid_alloc
+    30: 80010378    52 FUNC    LOCAL  DEFAULT    2 asid_free
+    31: 80016f70     4 OBJECT  LOCAL  DEFAULT    6 env_free_list
+    32: 80010568   400 FUNC    LOCAL  DEFAULT    2 env_setup_vm
+    33: 800107c4   684 FUNC    LOCAL  DEFAULT    2 load_icode_mapper
+    34: 80010a70   152 FUNC    LOCAL  DEFAULT    2 load_icode
+    35: 00000000     0 FILE    LOCAL  DEFAULT  ABS env_asm.S
+    36: 00000000     0 FILE    LOCAL  DEFAULT  ABS genex.S
+    37: 80012068     0 NOTYPE  LOCAL  DEFAULT    2 W
+    38: 80012070     0 NOTYPE  LOCAL  DEFAULT    2 end
+    39: 80012298     0 NOTYPE  LOCAL  DEFAULT    2 timer_irq
+    40: 8001235c     0 NOTYPE  LOCAL  DEFAULT    2 NOPAGE
+    41: 80012348     0 NOTYPE  LOCAL  DEFAULT    2 NoCOW
+    42: 00000000     0 FILE    LOCAL  DEFAULT  ABS getc.S
+    43: 00000000     0 FILE    LOCAL  DEFAULT  ABS kclock.c
+    44: 00000000     0 FILE    LOCAL  DEFAULT  ABS kclock_asm.S
+    45: 00000000     0 FILE    LOCAL  DEFAULT  ABS kernel_elfloader.c
+    46: 00000000     0 FILE    LOCAL  DEFAULT  ABS print.c
+    47: 80015dd0    25 OBJECT  LOCAL  DEFAULT    4 theFatalMsg
+    48: 00000000     0 FILE    LOCAL  DEFAULT  ABS printf.c
+    49: 80013260   152 FUNC    LOCAL  DEFAULT    2 myoutput
+    50: 00000000     0 FILE    LOCAL  DEFAULT  ABS sched.c
+    51: 80016f80     4 OBJECT  LOCAL  DEFAULT    6 e.914
+    52: 80016f84     4 OBJECT  LOCAL  DEFAULT    6 point.913
+    53: 80016f88     4 OBJECT  LOCAL  DEFAULT    6 count.912
+    54: 00000000     0 FILE    LOCAL  DEFAULT  ABS syscall.S
+    55: 800137f4     0 NOTYPE  LOCAL  DEFAULT    2 illegal_syscall
+    56: 00000000     0 FILE    LOCAL  DEFAULT  ABS syscall_all.c
+    57: 00000000     0 FILE    LOCAL  DEFAULT  ABS traps.c
+    58: 00000000     0 FILE    LOCAL  DEFAULT  ABS pmap.c
+    59: 80013b08   200 FUNC    LOCAL  DEFAULT    2 alloc
+    60: 80016f90     4 OBJECT  LOCAL  DEFAULT    6 freemem
+    61: 80013bd0   216 FUNC    LOCAL  DEFAULT    2 boot_pgdir_walk
+    62: 80016f94     4 OBJECT  LOCAL  DEFAULT    6 page_free_list
+    63: 80015fe0    44 OBJECT  LOCAL  DEFAULT    4 C.101.1615
+    64: 8001600c    40 OBJECT  LOCAL  DEFAULT    4 C.99.1609
+    65: 00000000     0 FILE    LOCAL  DEFAULT  ABS tlb_asm.S
+    66: 80015d24     0 NOTYPE  LOCAL  DEFAULT    2 NOFOUND
+    67: 800103ac   104 FUNC    GLOBAL DEFAULT    2 mkenvid
+    68: 800128f0  1584 FUNC    GLOBAL DEFAULT    2 lp_Print
+    69: 800138d8     8 FUNC    GLOBAL DEFAULT    2 sys_mem_unmap
+    70: 80013338   100 FUNC    GLOBAL DEFAULT    2 _panic
+    71: 800102a8    72 FUNC    GLOBAL DEFAULT    2 printstr
+    72: 80025300     0 OBJECT  GLOBAL DEFAULT    8 KERNEL_SP
+    73: 800132f8    64 FUNC    GLOBAL DEFAULT    2 printf
+    74: 800138b0     8 FUNC    GLOBAL DEFAULT    2 sys_yield
+    75: 800143ac   440 FUNC    GLOBAL DEFAULT    2 page_insert
+    76: 80015bd8   236 FUNC    GLOBAL DEFAULT    2 pageout
+    77: 800127a0    28 FUNC    GLOBAL DEFAULT    2 set_timer
+    78: 800138f0     8 FUNC    GLOBAL DEFAULT    2 sys_set_trapframe
+    79: 80010414   188 FUNC    GLOBAL DEFAULT    2 envid2env
+    80: 80014564   164 FUNC    GLOBAL DEFAULT    2 page_lookup
+    81: 800114ac  2736 FUNC    GLOBAL DEFAULT    2 load_icode_check
+    82: 80014150   240 FUNC    GLOBAL DEFAULT    2 page_alloc
+    83: 800106f8   204 FUNC    GLOBAL DEFAULT    2 env_alloc
+    84: 80010e8c   136 FUNC    GLOBAL DEFAULT    2 env_run
+    85: 80013864    52 FUNC    GLOBAL DEFAULT    2 memcpy
+    86: 800123a0   308 FUNC    GLOBAL DEFAULT    2 handle_reserved
+    87: 800138e8     8 FUNC    GLOBAL DEFAULT    2 sys_set_env_status
+    88: 80022978     4 OBJECT  GLOBAL DEFAULT    8 binary_user_check_icode_s
+    89: 800127c0    24 FUNC    GLOBAL DEFAULT    2 is_elf_format
+    90: 800138f8     8 FUNC    GLOBAL DEFAULT    2 sys_panic
+    91: 80016f60     4 OBJECT  GLOBAL DEFAULT    6 envs
+    92: 80013a90   120 FUNC    GLOBAL DEFAULT    2 mips_detect_memory
+    93: 80017020     8 OBJECT  GLOBAL DEFAULT    7 env_sched_list
+    94: 80013900     8 FUNC    GLOBAL DEFAULT    2 sys_ipc_recv
+    95: 800130bc   408 FUNC    GLOBAL DEFAULT    2 PrintNum
+    96: 80012620   308 FUNC    GLOBAL DEFAULT    2 handle_mod
+    97: 800138c8     8 FUNC    GLOBAL DEFAULT    2 sys_mem_alloc
+    98: 80010260    12 FUNC    GLOBAL DEFAULT    2 test1
+    99: 800101cc    80 FUNC    GLOBAL DEFAULT    2 bzero
+   100: 80010280    20 FUNC    GLOBAL DEFAULT    2 printcharc
+   101: 80013ca8   164 FUNC    GLOBAL DEFAULT    2 boot_map_segment
+   102: 80012780    32 FUNC    GLOBAL DEFAULT    2 kclock_init
+   103: 800127d8   276 FUNC    GLOBAL DEFAULT    2 load_elf
+   104: 80017028     4 OBJECT  GLOBAL DEFAULT    7 npage
+   105: 80012090     0 FUNC    GLOBAL DEFAULT    2 ret_from_exception
+   106: 80013840    36 FUNC    GLOBAL DEFAULT    2 sys_putchar
+   107: 800138b8     8 FUNC    GLOBAL DEFAULT    2 sys_env_destroy
+   108: 80400000     0 NOTYPE  GLOBAL DEFAULT  ABS end
+   109: 80011f60   196 FUNC    GLOBAL DEFAULT    2 env_pop_tf
+   110: 80015cd0   100 FUNC    GLOBAL DEFAULT    2 tlb_out
+   111: 8001702c     4 OBJECT  GLOBAL DEFAULT    7 boot_pgdir
+   112: 80010050   176 FUNC    GLOBAL DEFAULT    2 test
+   113: 80010000    76 FUNC    GLOBAL DEFAULT    2 _start
+   114: 80012040    80 FUNC    GLOBAL DEFAULT    2 handle_AdEL
+   115: 80012760    28 FUNC    GLOBAL DEFAULT    2 sys_cgetc
+   116: 80013d4c   380 FUNC    GLOBAL DEFAULT    2 mips_vm_init
+   117: 80012f9c   288 FUNC    GLOBAL DEFAULT    2 PrintString
+   118: 800138d0     8 FUNC    GLOBAL DEFAULT    2 sys_mem_map
+   119: 800137fc    60 OBJECT  GLOBAL DEFAULT    2 sys_call_table
+   120: 80010bc4   604 FUNC    GLOBAL DEFAULT    2 env_free
+   121: 80022980  5298 OBJECT  GLOBAL DEFAULT    8 binary_user_A_start
+   122: 800138e0     8 FUNC    GLOBAL DEFAULT    2 sys_env_alloc
+   123: 80010168   100 FUNC    GLOBAL DEFAULT    2 bcopy
+   124: 80017048     0 OBJECT  GLOBAL DEFAULT    8 tlbra
+   125: 80000080    36 FUNC    GLOBAL DEFAULT    1 except_vec3
+   126: 80014710  1532 FUNC    GLOBAL DEFAULT    2 physical_memory_manage_ch
+   127: 800124e0   308 FUNC    GLOBAL DEFAULT    2 handle_tlb
+   128: 800139d8   184 FUNC    GLOBAL DEFAULT    2 page_fault_handler
+   129: 80017050 47400 OBJECT  GLOBAL DEFAULT    8 binary_user_check_icode_s
+   130: 800138c0     8 FUNC    GLOBAL DEFAULT    2 sys_set_pgfault_handler
+   131: 80010220    52 FUNC    GLOBAL DEFAULT    2 main
+   132: 80012f20   124 FUNC    GLOBAL DEFAULT    2 PrintChar
+   133: 80014d0c  3788 FUNC    GLOBAL DEFAULT    2 page_check
+   134: 80023e40  5298 OBJECT  GLOBAL DEFAULT    8 binary_user_B_start
+   135: 80014640   116 FUNC    GLOBAL DEFAULT    2 page_remove
+   136: 80014240    68 FUNC    GLOBAL DEFAULT    2 page_free
+   137: 80012160   312 FUNC    GLOBAL DEFAULT    2 handle_int
+   138: 800104d0   152 FUNC    GLOBAL DEFAULT    2 env_init
+   139: 800122b0   240 FUNC    GLOBAL DEFAULT    2 do_refill
+   140: 80017044     0 OBJECT  GLOBAL DEFAULT    8 delay
+   141: 8001026c    12 FUNC    GLOBAL DEFAULT    2 test2
+   142: 800122b0     0 FUNC    GLOBAL DEFAULT    2 do_reserved
+   143: 80017030     4 OBJECT  GLOBAL DEFAULT    7 maxpa
+   144: 80010e20   108 FUNC    GLOBAL DEFAULT    2 env_destroy
+   145: 80016f64     4 OBJECT  GLOBAL DEFAULT    6 curenv
+   146: 80014608    56 FUNC    GLOBAL DEFAULT    2 page_decref
+   147: 80013898    24 FUNC    GLOBAL DEFAULT    2 sys_getenvid
+   148: 800252f4     4 OBJECT  GLOBAL DEFAULT    8 binary_user_B_size
+   149: 80010294    20 FUNC    GLOBAL DEFAULT    2 halt
+   150: 80010100   104 FUNC    GLOBAL DEFAULT    2 mips_init
+   151: 80017034     4 OBJECT  GLOBAL DEFAULT    7 basemem
+   152: 80012024    16 FUNC    GLOBAL DEFAULT    2 lcontext
+   153: 80016fa0   128 OBJECT  GLOBAL DEFAULT    6 exception_handlers
+   154: 80013ec8   648 FUNC    GLOBAL DEFAULT    2 page_init
+   155: 80010f14  1432 FUNC    GLOBAL DEFAULT    2 env_check
+   156: 80014284   296 FUNC    GLOBAL DEFAULT    2 pgdir_walk
+   157: 80017038     4 OBJECT  GLOBAL DEFAULT    7 extmem
+   158: 80013910   172 FUNC    GLOBAL DEFAULT    2 trap_init
+   159: 80010ba4    32 FUNC    GLOBAL DEFAULT    2 env_create
+   160: 80013660   412 FUNC    GLOBAL DEFAULT    2 handle_sys
+   161: 800139bc    28 FUNC    GLOBAL DEFAULT    2 set_except_vector
+   162: 80023e34     4 OBJECT  GLOBAL DEFAULT    8 binary_user_A_size
+   163: 80013908     8 FUNC    GLOBAL DEFAULT    2 sys_ipc_can_send
+   164: 800133a0   700 FUNC    GLOBAL DEFAULT    2 sched_yield
+   165: 8001703c     4 OBJECT  GLOBAL DEFAULT    7 pages
+   166: 80017040     0 OBJECT  GLOBAL DEFAULT    8 mCONTEXT
+   167: 80010b08   156 FUNC    GLOBAL DEFAULT    2 env_create_priority
+   168: 800146b4    92 FUNC    GLOBAL DEFAULT    2 tlb_invalidate

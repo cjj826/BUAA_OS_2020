@@ -29,14 +29,7 @@ nop
 	END(handle_\exception)
 .endm
 
-NESTED(handle_AdEL, 0, sp)
-nop
-#.set noat
-nop
-#SAVE_ALL
-#CLI
-#.set at
-
+NESTED(AdEL, 0, sp)
 mfc0 k0, CP0_EPC
 
 lw k0, 0(k0)
@@ -49,6 +42,7 @@ nop
 li k1, 32
 nop
 j end
+nop
 W:
 	li k1, 33
 	nop 
@@ -73,7 +67,7 @@ nop
 #jr k0
 #rfe
 #nop
-END(handle_AdEL)
+END(AdEL)
 
 
 
@@ -205,3 +199,4 @@ END(do_refill)
 BUILD_HANDLER reserved do_reserved cli
 BUILD_HANDLER tlb	do_refill	cli
 BUILD_HANDLER mod	page_fault_handler cli
+BUILD_HANDLER AdEL AdEL cli

@@ -1,0 +1,8 @@
+syscall.S: Assembler messages:
+syscall.S:10: Warning: Used $at without ".set noat"
+syscall_all.c: In function 'sys_putchar':
+syscall_all.c:14: warning: implicit declaration of function 'printcharc'
+pmap.c: In function 'boot_map_segment':
+pmap.c:132: warning: unused variable 'va_temp'
+pmap.c: In function 'page_alloc':
+pmap.c:254: warning: passing argument 1 of 'bzero' makes pointer from integer without a cast
