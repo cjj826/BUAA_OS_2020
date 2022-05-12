@@ -31,10 +31,10 @@ nop
 
 NESTED(handle_AdEL, TF_SIZE, sp)
 nop
-.set noat
+#.set noat
 nop
-SAVE_ALL
-CLI
+#SAVE_ALL
+#CLI
 .set at
 
 mfc0 k0, CP0_EPC
