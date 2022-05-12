@@ -13,7 +13,7 @@ struct Env *envs = NULL;        // All environments
 struct Env *curenv = NULL;            // the current env
 
 static struct Env_list env_free_list;    // Free list
-struct Env_list env_sched_list[2];      // Runnable list
+struct Env_list env_sched_list[3];      // Runnable list
  
 extern Pde *boot_pgdir;
 extern char *KERNEL_SP;
@@ -137,7 +137,8 @@ env_init(void)
     /* Step 1: Initialize env_free_list. */
 	LIST_INIT(&env_free_list);
 	LIST_INIT(env_sched_list);
-	LIST_INIT(env_sched_list + 1);    
+	LIST_INIT(env_sched_list + 1);
+	LIST_INIT(env_sched_list + 2);    
     for (i = NENV-1; i >= 0; i--) {
         envs[i].env_status = ENV_FREE;
         LIST_INSERT_HEAD(&env_free_list, envs + i, env_link);
