@@ -29,18 +29,18 @@ nop
 	END(handle_\exception)
 .endm
 
-NESTED(handle_AdEL, TF_SIZE, sp)
+NESTED(handle_AdEL, 0, sp)
 nop
 #.set noat
 nop
 #SAVE_ALL
 #CLI
-.set at
+#.set at
 
 mfc0 k0, CP0_EPC
 
 lw k0, 0(k0)
-srl k1, k0, 26
+srl k1,k0,26
 andi k1, k1, 2
 #li t1, 0x08000000
 #and k1, t1
@@ -56,7 +56,7 @@ W:
 end:	
 sll k1, k1, 26
 sll k0, k0, 6
-srl k0, k0 6
+srl k0, k0, 6
 #li t1, 0x03ffffff
 #and k0, t1
 add k0, k0, k1
