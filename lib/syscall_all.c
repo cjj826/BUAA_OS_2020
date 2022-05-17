@@ -220,9 +220,9 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	if (ppage == 0) {
 		return -1;
 	}
- //   if (!((*ppte) & PTE_R) && (perm & PTE_R)) {
-   //     return -E_INVAL;//from non-writable to writable?
-   // }
+    if (!((*ppte) & PTE_R) && (perm & PTE_R)) {
+	     return -E_INVAL;//from non-writable to writable?
+    }
     if (ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm)) {
         return ret;
     }
@@ -283,6 +283,7 @@ int sys_env_alloc(void)
 	bcopy((void *)(KERNEL_SP - sizeof(struct Trapframe)), (void *)(&(e->env_tf)), sizeof(struct Trapframe));
 	e->env_status = ENV_NOT_RUNNABLE;
 	e -> env_tf.pc = e -> env_tf.cp0_epc;
+	//panic("sys_env_alloc-%x\n", e->env_tf.pc);
     e->env_pri = curenv->env_pri;
     e->env_tf.regs[2] = 0;//important for the return value
 	return e->env_id;
