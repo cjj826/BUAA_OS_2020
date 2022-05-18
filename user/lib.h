@@ -41,7 +41,9 @@ int fork(void);
 void user_bcopy(const void *src, void *dst, size_t len);
 void user_bzero(void *v, u_int n);
 //////////////////////////////////////////////////syscall_lib
-extern int msyscall(int, int, int, int, int, int);
+//extern int msyscall(int, int, int, int, int, int);
+extern int msyscall(int, int, ...);
+int syscall_sum(u_int a, u_int b, u_int c, u_int d, u_int e, u_int f);
 
 void syscall_putchar(char ch);
 u_int syscall_getenvid(void);

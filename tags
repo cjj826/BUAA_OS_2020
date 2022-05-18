@@ -300,14 +300,14 @@ NULL	readelf/types.h	8;"	d
 NoCOW	lib/genex.S	/^NoCOW:$/;"	l
 OUTPUT	lib/print.c	35;"	d	file:
 OUTPUT	user/print.c	36;"	d	file:
-O_ACCMODE	user/lib.h	135;"	d
-O_CREAT	user/lib.h	137;"	d
-O_EXCL	user/lib.h	139;"	d
-O_MKDIR	user/lib.h	140;"	d
-O_RDONLY	user/lib.h	132;"	d
-O_RDWR	user/lib.h	134;"	d
-O_TRUNC	user/lib.h	138;"	d
-O_WRONLY	user/lib.h	133;"	d
+O_ACCMODE	user/lib.h	137;"	d
+O_CREAT	user/lib.h	139;"	d
+O_EXCL	user/lib.h	141;"	d
+O_MKDIR	user/lib.h	142;"	d
+O_RDONLY	user/lib.h	134;"	d
+O_RDWR	user/lib.h	136;"	d
+O_TRUNC	user/lib.h	140;"	d
+O_WRONLY	user/lib.h	135;"	d
 PADDR	include/mmu.h	146;"	d
 PDMAP	include/mmu.h	17;"	d
 PDSHIFT	include/mmu.h	19;"	d
@@ -387,6 +387,7 @@ SYS_putchar	include/unistd.h	8;"	d
 SYS_set_env_status	include/unistd.h	17;"	d
 SYS_set_pgfault_handler	include/unistd.h	12;"	d
 SYS_set_trapframe	include/unistd.h	18;"	d
+SYS_sum	include/unistd.h	23;"	d
 SYS_yield	include/unistd.h	10;"	d
 Stat	user/fd.h	/^struct Stat {$/;"	s
 Super	include/fs.h	/^struct Super {$/;"	s
@@ -574,6 +575,8 @@ e_type	include/kerelf.h	/^	Elf32_Half	e_type;			\/* Object file type *\/$/;"	m	s
 e_type	readelf/kerelf.h	/^        Elf32_Half      e_type;                 \/* Object file type *\/$/;"	m	struct:__anon3
 e_version	include/kerelf.h	/^	Elf32_Word	e_version;		\/* Object file version *\/$/;"	m	struct:__anon1
 e_version	readelf/kerelf.h	/^        Elf32_Word      e_version;              \/* Object file version *\/$/;"	m	struct:__anon3
+endAgv3	lib/syscall.S	/^endAgv3:$/;"	l
+endloop	lib/syscall.S	/^endloop:$/;"	l
 env	user/libos.c	/^struct Env *env;$/;"	v	typeref:struct:Env
 env_alloc	lib/env.c	/^env_alloc(struct Env **new, u_int parent_id)$/;"	f
 env_check	lib/env.c	/^void env_check()$/;"	f
@@ -669,6 +672,7 @@ load_icode	lib/env.c	/^load_icode(struct Env *e, u_char *binary, u_int size)$/;"
 load_icode_check	lib/env.c	/^void load_icode_check() {$/;"	f
 load_icode_mapper	lib/env.c	/^static int load_icode_mapper(u_long va, u_int32_t sgsize,$/;"	f	file:
 loop	boot/start.S	/^loop:$/;"	l
+loop	lib/syscall.S	/^loop:$/;"	l
 lp_Print	lib/print.c	/^lp_Print(void (*output)(void *, char *, int), $/;"	f
 mCONTEXT	boot/start.S	/^mCONTEXT:$/;"	l
 main	init/main.c	/^int main()$/;"	f
@@ -825,6 +829,7 @@ sys_putchar	lib/syscall_all.c	/^void sys_putchar(int sysno, int c, int a2, int a
 sys_set_env_status	lib/syscall_all.c	/^int sys_set_env_status(int sysno, u_int envid, u_int status)$/;"	f
 sys_set_pgfault_handler	lib/syscall_all.c	/^int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)$/;"	f
 sys_set_trapframe	lib/syscall_all.c	/^int sys_set_trapframe(int sysno, u_int envid, struct Trapframe *tf)$/;"	f
+sys_sum	lib/syscall_all.c	/^int sys_sum(int sysno, u_int a, u_int b, u_int c, u_int d, u_int e, u_int f) {$/;"	f
 sys_yield	lib/syscall_all.c	/^void sys_yield(void)$/;"	f
 syscall_cgetc	user/syscall_lib.c	/^syscall_cgetc()$/;"	f
 syscall_env_alloc	user/lib.h	/^inline static int syscall_env_alloc(void)$/;"	f
@@ -840,6 +845,7 @@ syscall_putchar	user/syscall_lib.c	/^void syscall_putchar(char ch)$/;"	f
 syscall_set_env_status	user/syscall_lib.c	/^syscall_set_env_status(u_int envid, u_int status)$/;"	f
 syscall_set_pgfault_handler	user/syscall_lib.c	/^syscall_set_pgfault_handler(u_int envid, void (*func)(void), u_int xstacktop)$/;"	f
 syscall_set_trapframe	user/syscall_lib.c	/^syscall_set_trapframe(u_int envid, struct Trapframe *tf)$/;"	f
+syscall_sum	user/syscall_lib.c	/^int syscall_sum(u_int a, u_int b, u_int c, u_int d, u_int e, u_int f) {$/;"	f
 syscall_yield	user/syscall_lib.c	/^syscall_yield(void)$/;"	f
 t0	include/asm-mips3k/regdef.h	23;"	d
 t0	include/asm/regdef.h	23;"	d
@@ -906,7 +912,7 @@ umain	user/tltest.c	/^void umain() {$/;"	f
 user_PrintChar	user/print.c	/^user_PrintChar(char *buf, char c, int length, int ladjust)$/;"	f
 user_PrintNum	user/print.c	/^user_PrintNum(char *buf, unsigned long u, int base, int negFlag,$/;"	f
 user_PrintString	user/print.c	/^user_PrintString(char *buf, char *s, int length, int ladjust)$/;"	f
-user_assert	user/lib.h	128;"	d
+user_assert	user/lib.h	130;"	d
 user_bcopy	user/fork.c	/^void user_bcopy(const void *src, void *dst, size_t len)$/;"	f
 user_bzero	user/fork.c	/^void user_bzero(void *v, u_int n)$/;"	f
 user_dir	Makefile	/^user_dir	  := user$/;"	m

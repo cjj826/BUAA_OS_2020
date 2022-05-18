@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 /*** exercise 4.2 ***/
+
 NESTED(handle_sys,TF_SIZE, sp)
     SAVE_ALL                            // Macro used to save trapframe
     CLI                                 // Clean Interrupt Mask
@@ -52,6 +53,65 @@ NESTED(handle_sys,TF_SIZE, sp)
     nop
 END(handle_sys)
 
+/*
+NESTED(handle_sys, TF_SIZE, sp)
+    SAVE_ALL
+    CLI
+    nop
+    .set at
+
+    lw t0, TF_EPC(sp)
+    addiu t0, t0, 4
+    sw t0, TF_EPC(sp)
+
+    lw a0, TF_REG4(sp)//sysno
+
+    addiu a0, a0, -__SYSCALL_BASE
+    sll t0, a0, 2
+    la t1, sys_call_table
+    addu t1, t1, t0
+    lw t2, 0(t1)//the addr of func
+
+    lw a1, TF_REG5(sp) // number of var
+    lw s0, TF_REG29(sp) // user stack
+
+    addiu t1, a1, 1
+    sll s1, t1, 2 // offset
+    subu sp, sp, s1
+
+    addiu t0, s0, 20
+    addiu t4, sp, 16
+
+    li t1, 6
+    addiu t3, a1, 2
+
+loop:
+	bgt t1, t3, endloop
+    nop
+    lw t5, 0(t0)
+    sw t5, 0(t4)
+    addiu t0, t0, 4
+    addiu t4, t4, 4
+    addiu t1, t1, 1
+    j loop
+    nop
+endloop:
+    move t0, a1 //get the number
+    move a1, a2
+    move a2, a3
+
+    blt t0, 3, endAgv3
+    nop
+    lw a3, 16(s0)
+endAgv3:
+    jalr t2
+    nop
+    addu sp, sp, s1
+    sw v0, TF_REG2(sp)
+    j ret_from_exception
+    nop
+END(handle_sys)
+*/
 sys_call_table:                         // Syscall Table
     .align 2
     .word sys_putchar
@@ -69,3 +129,4 @@ sys_call_table:                         // Syscall Table
     .word sys_ipc_can_send
     .word sys_ipc_recv
     .word sys_cgetc
+	.word sys_sum

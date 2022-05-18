@@ -87,3 +87,7 @@ syscall_cgetc()
 {
 	return msyscall(SYS_cgetc, 0, 0, 0, 0, 0);
 }
+
+int syscall_sum(u_int a, u_int b, u_int c, u_int d, u_int e, u_int f) {
+	return msyscall(SYS_sum, 6, a, b, c, d, e, f);
+}
