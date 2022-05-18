@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 /*** exercise 4.2 ***/
-
+/*
 NESTED(handle_sys,TF_SIZE, sp)
     SAVE_ALL                            // Macro used to save trapframe
     CLI                                 // Clean Interrupt Mask
@@ -52,8 +52,8 @@ NESTED(handle_sys,TF_SIZE, sp)
     j       ret_from_exception          // Return from exeception
     nop
 END(handle_sys)
+*/
 
-/*
 NESTED(handle_sys, TF_SIZE, sp)
     SAVE_ALL
     CLI
@@ -96,6 +96,7 @@ loop:
     j loop
     nop
 endloop:
+	addiu a0, a0, __SYSCALL_BASE
     move t0, a1 //get the number
     move a1, a2
     move a2, a3
@@ -111,7 +112,7 @@ endAgv3:
     j ret_from_exception
     nop
 END(handle_sys)
-*/
+
 sys_call_table:                         // Syscall Table
     .align 2
     .word sys_putchar
