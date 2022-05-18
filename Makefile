@@ -34,7 +34,7 @@ $(modules):
 	$(MAKE) --directory=$@
 run:
 	/OSLAB/gxemul -E testmips -C R3000 -M 64 $(vmlinux_elf)
-debug:
+debug: clean all
 	/OSLAB/gxemul -E testmips -C R3000 -M 64 -V $(vmlinux_elf)
 clean:
 	for d in $(modules);				\
@@ -42,5 +42,6 @@ clean:
 			$(MAKE) --directory=$$d clean;	\
 		done;					\
 	rm -rf *.o *~ $(vmlinux_elf)
+test: clean all run
 
 include include.mk
