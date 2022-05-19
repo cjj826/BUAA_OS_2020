@@ -139,7 +139,7 @@ void sched_yield(void)
         	}
     	}
 	
-	count --;
+	count--;
 	if (e != NULL) {
 		env_run(e);
 	}
