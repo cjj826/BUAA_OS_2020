@@ -7,16 +7,23 @@
 
 extern char *KERNEL_SP;
 extern struct Env *curenv;
-
+u_int mconsole = 0;
 /* Overview:
  * 	This function is used to print a character on screen.
  *
  * Pre-Condition:
  * 	`c` is the character you want to print.
  */
+u_int sys_getenvid(void)
+{
+    return curenv->env_id;
+}
+
 void sys_putchar(int sysno, int c, int a2, int a3, int a4, int a5)
 {
-	printcharc((char) c);
+	if (mconsole == sys_getenvid()) {
+		printcharc((char) c);
+	}
 	return ;
 }
 
@@ -49,11 +56,11 @@ void *memcpy(void *destaddr, void const *srcaddr, u_int len)
  *
  * Post-Condition:
  * 	return the current environment id
- */
+ *//*
 u_int sys_getenvid(void)
 {
 	return curenv->env_id;
-}
+}*/
 
 /* Overview:
  *	This function enables the current process to give up CPU.
@@ -431,10 +438,40 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	return 0;
 }
 
-int sys_sum(int sysno, u_int a, u_int b, u_int c, u_int d, u_int e, u_int f) {
+int sys_try_acquire_console(int syno) {
+    if (mconsole == 0) {
+        mconsole = sys_getenvid();
+        return 0;
+    } else return -1;
+}
+int sys_release_console(int syno) {
+    if (mconsole == sys_getenvid()) {
+        mconsole = 0;
+        return 0;
+    } else return -1;
+}
+/*
+int sys_sum(int sysno, u_int a, u_int b, u_int c, u_int d, u_int e) {
 	printf("I got it!\n");
 	printf("%d\n", sysno);
-	int sum = a + b + c + d + e + f;
+	int sum = a + b + c + d + e;
 	printf("%d\n", sum);
-	printf("%d %d %d %d %d %d\n", a, b, c, d, e, f);
+//	printf("%d %d %d %d %d %d\n", a, b, c, d, e, f);
+}*/
+int sys_sum(void) {
+	return 0;
 }
+/*
+//u_int mconsole = 0;
+int sys_try_acquire_console(int syno) {
+	if (mconsole == 0) {
+		mconsole = sys_getenvid();
+		return 0;
+	} else return -1;
+}
+int sys_release_console(int syno) {
+	if (mconsole == sys_getenvid()) {
+		mconsole = 0;
+		return 0;
+	} else return -1;
+}*/

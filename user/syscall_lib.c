@@ -92,3 +92,10 @@ syscall_cgetc()
 int syscall_sum(u_int a, u_int b, u_int c, u_int d, u_int e, u_int f) {
 	return msyscall(SYS_sum, 6, a, b, c, d, e, f);
 }
+
+int syscall_try_acquire_console(){
+	return msyscall(SYS_try_acquire_console, 0, 0, 0, 0, 0);
+}
+int syscall_release_console() {
+	return msyscall(SYS_release_console, 0, 0, 0, 0, 0);
+}

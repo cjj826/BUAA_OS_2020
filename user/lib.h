@@ -44,6 +44,8 @@ void user_bzero(void *v, u_int n);
 //extern int msyscall(int, int, int, int, int, int);
 extern int msyscall(int, int, ...);
 int syscall_sum(u_int a, u_int b, u_int c, u_int d, u_int e, u_int f);
+int syscall_try_acquire_console();
+int syscall_release_console();
 
 void syscall_putchar(char ch);
 u_int syscall_getenvid(void);

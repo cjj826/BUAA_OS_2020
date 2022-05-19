@@ -21,4 +21,6 @@
 #define SYS_ipc_recv		((__SYSCALL_BASE ) + (13 ) )
 #define SYS_cgetc			((__SYSCALL_BASE ) + (14 ) )
 #define SYS_sum             ((__SYSCALL_BASE ) + (15 ) )
+#define SYS_try_acquire_console ((__SYSCALL_BASE ) + (16 ) )
+#define SYS_release_console   ((__SYSCALL_BASE ) + (17 ) )
 #endif
