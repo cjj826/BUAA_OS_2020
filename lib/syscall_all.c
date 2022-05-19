@@ -369,6 +369,17 @@ void sys_panic(int sysno, char *msg)
  * ENV_NOT_RUNNABLE, giving up cpu.
  */
 /*** exercise 4.7 ***/
+typedef struct Queue{
+	u_int sender_id;
+	u_int recv_id;
+	u_int value;
+	u_int srcva;
+	u_int perm;
+	u_int wait;
+} Queue;
+Queue queue[100000];
+int tot;
+
 void sys_ipc_recv(int sysno, u_int dstva)
 {
 	if (dstva >= UTOP) {
@@ -376,8 +387,24 @@ void sys_ipc_recv(int sysno, u_int dstva)
     }
     curenv->env_ipc_recving = 1;
     curenv->env_ipc_dstva = dstva;
-    curenv->env_status = ENV_NOT_RUNNABLE;
-    sys_yield();
+	int i;
+	for (i = 0; i < tot; i++) {
+		if (queue[i].wait == 1 && queue[i].recv_id == curenv->env_id) {
+			queue[i].wait = 0;
+			break;
+		}
+	}
+	struct Env *sender;
+	struct Env *recv;
+	if (i == tot) {
+		curenv->env_status = ENV_NOT_RUNNABLE;
+		sys_yield();
+	} else {
+		envid2env(queue[i].sender_id, &sender, 0);
+		envid2env(queue[i].recv_id, &recv, 0);
+		recieve(sender, recv, queue[i].value, queue[i].srcva, queue[i].perm, 0);
+	}
+   // sys_yield();
 }
 
 /* Overview:
@@ -412,8 +439,19 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
         return r;
     }
     if (!e->env_ipc_recving) {
+		curenv->env_status = ENV_NOT_RUNNABLE;
+		queue[tot].sender_id = curenv->env_id;
+		queue[tot].recv_id = envid;
+		queue[tot].value = value;
+		queue[tot].srcva = srcva;
+		queue[tot].perm = perm;
+		queue[tot].wait = 1;
+		tot++;
+		sys_yield();
         return -E_IPC_NOT_RECV;
     } 
+	recieve(curenv, e, value, srcva, perm, 1);
+	/*
     e->env_ipc_recving = 0;
     e->env_ipc_from = curenv->env_id;
     e->env_ipc_value = value;
@@ -427,14 +465,40 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 		if (r = page_insert(e->env_pgdir, p, e->env_ipc_dstva, perm)) {
 			return r;
 		}
-	}
+	}*/
 	return 0;
 }
 
-int sys_sum(int sysno, u_int a, u_int b, u_int c, u_int d, u_int e, u_int f) {
+int recieve(struct Env * sender, struct Env *recv, u_int value, u_int srcva,
+                     u_int perm, int type) {
+	int r;
+	struct Page *p;
+	recv->env_ipc_recving = 0;
+    recv->env_ipc_from = sender->env_id;
+    recv->env_ipc_value = value;
+    if (type == 1) {
+		recv->env_status = ENV_RUNNABLE;
+	} else {
+		sender->env_status = ENV_RUNNABLE;
+	}
+    recv->env_ipc_perm = perm;
+    if (srcva) {
+        p = page_lookup(sender->env_pgdir, srcva, NULL);
+        if (p == 0) {
+            return -1;
+        }
+        if (r = page_insert(recv->env_pgdir, p, recv->env_ipc_dstva, perm)) {
+            return r;
+        }
+    }
+    return 0;
+	
+}
+
+int sys_sum(int sysno, u_int a, u_int b, u_int c, u_int d, u_int e) {
 	printf("I got it!\n");
 	printf("%d\n", sysno);
-	int sum = a + b + c + d + e + f;
+	int sum = a + b + c + d + e;
 	printf("%d\n", sum);
-	printf("%d %d %d %d %d %d\n", a, b, c, d, e, f);
+	//printf("%d %d %d %d %d %d\n", a, b, c, d, e, f);
 }
