@@ -460,6 +460,26 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
 {
         // Your code here
+	if (va >= ULIM) {
+		return -E_INVAL;
+	}
+	if (dev >= 0x10000000 && dev < 0x10000020) {
+		if (dev + len >= 0x10000020) {
+			return -E_INVAL;
+		}
+	} else if (dev >= 0x13000000 && dev < 0x13004200) {
+		if (dev + len >= 0x13004200) {
+			 return -E_INVAL;
+		}
+	} else if (dev >= 0x15000000 && dev < 0x15000200) {
+		if (dev + len >= 0x15000200) {
+			return -E_INVAL;
+		}
+	} else {
+		return -E_INVAL;
+	}
+	bcopy((void *)va, (void *)(dev + 0xA0000000), len);
+	return 0;
 }
 
 /* Overview:
@@ -481,5 +501,25 @@ int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
  /*** exercise 5.1 ***/
 int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
 {
+	if (va >= ULIM) {
+        return -E_INVAL;
+    }
+	if (dev >= 0x10000000 && dev < 0x10000020) {
+        if (dev + len >= 0x10000020) {
+            return -E_INVAL;
+        }
+    } else if (dev >= 0x13000000 && dev < 0x13004200) {
+        if (dev + len >= 0x13004200) {
+             return -E_INVAL;
+        }
+    } else if (dev >= 0x15000000 && dev < 0x15000200) {
+        if (dev + len >= 0x15000200) {
+            return -E_INVAL;
+        }
+    } else {
+        return -E_INVAL;
+    }
+	bcopy((void *)(dev + 0xA0000000), (void *)va, len);
+    return 0;
         // Your code here
 }
