@@ -446,6 +446,6 @@ int sys_sign(int sysno, u_int envid, int sig) {
 		if ((r = envid2env(envid, &e, 1)) < 0) {
 			return r;
 		}
-		env_destroy(envid);
+		env_destroy(e);
 	}
 }
