@@ -110,6 +110,39 @@ pgfault(u_int va)
     }
 }
 
+int make_shared(void *va) {
+	u_int v = (u_int) va;
+	v = ROUNDDOWN(va, BY2PG);
+	//u_int *tmp;
+	//extern struct Page *p;
+	//1
+	if (v >= UTOP) {
+		return -1;
+	}
+	//2
+	u_int i;
+	i = VPN(v);
+	u_int flag = 0;
+	if (((*vpd)[ i >> 10] & PTE_V) && ((*vpt)[i] & PTE_V)) {
+		if (!( (*vpt)[i] & PTE_R )) {
+			return -1;
+		}
+		flag = 1;//has one
+	}
+	u_int perm;
+	if (flag == 1) {
+		perm = (*vpt)[VPN(v)] & 0xfff;
+		syscall_mem_map(0, v, 0, v, perm|PTE_LIBRARY);
+	} else {
+		if (syscall_mem_alloc(0, v, PTE_V|PTE_R|PTE_LIBRARY)) {
+			//user_panic("can't sys_mem_alloc!");
+			return -1;
+		}
+	}
+	u_int phy = (*vpt)[i] & 0xfffff000;
+	return phy;
+}
+
 /* Overview:
  * 	Map our virtual page `pn` (address pn*BY2PG) into the target `envid`
  * at the same virtual address.
@@ -149,7 +182,7 @@ duppage(u_int envid, u_int pn)
 /* Overview:
  * 	User-level fork. Create a child and then copy our address space
  * and page fault handler setup to the child.
- *
+*
  * Hint: use vpd, vpt, and duppage.
  * Hint: remember to fix "env" in the child process!
  * Note: `set_pgfault_handler`(user/pgfault.c) is different from
