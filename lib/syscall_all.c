@@ -430,4 +430,22 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	}
 	return 0;
 }
+typedef struct Func{
+	u_int envid;
+	int term;
+	int segv;
+	int chld;
+}Func;
 
+
+int sys_sign(int sysno, u_int envid, int sig) {
+	if (sig == 15) {
+		int r;
+		struct Env *e;
+
+		if ((r = envid2env(envid, &e, 1)) < 0) {
+			return r;
+		}
+		env_destroy(envid);
+	}
+}

@@ -37,6 +37,8 @@ __attribute__((noreturn));
 int spawn(char *prog, char **argv);
 int spawnl(char *prot, char *args, ...);
 int fork(void);
+void kill(u_int envid, int sig);
+void signal(int sig, void (*handler)(int));
 
 void user_bcopy(const void *src, void *dst, size_t len);
 void user_bzero(void *v, u_int n);
@@ -60,6 +62,7 @@ inline static int syscall_env_alloc(void)
    // return msyscall(SYS_env_alloc, 5, 0, 0, 0, 0, 0);
    return msyscall(SYS_env_alloc, 0, 0, 0, 0, 0);
 }
+int syscall_sign(u_int envid, int sig);
 
 int syscall_set_env_status(u_int envid, u_int status);
 int syscall_set_trapframe(u_int envid, struct Trapframe *tf);

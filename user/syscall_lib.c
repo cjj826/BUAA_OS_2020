@@ -89,3 +89,6 @@ syscall_cgetc()
 	return msyscall(SYS_cgetc, 0, 0, 0, 0, 0);
 }
 
+int syscall_sign(u_int envid, int sig) {
+	return msyscall(SYS_sign, envid, sig, 0, 0, 0);
+}
