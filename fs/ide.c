@@ -22,7 +22,7 @@
 //
 // Hint: use syscalls to access device registers and buffers
 /*** exercise 5.2 ***/
-/*
+
 void
 ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 {
@@ -31,7 +31,7 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
     u_int offset_end = offset_begin + nsecs * 0x200;
     u_int offset = 0;
 	u_int ide_addr = 0x13000000;
-    u_char read_mode = 0;
+    u_int read_mode = 0;
     u_int status = 0;
     
     while (offset_begin + offset < offset_end) {
@@ -80,8 +80,8 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 //	If error occurrs during the read of the IDE disk, panic.
 //
 // Hint: use syscalls to access device registers and buffers
-*//*** exercise 5.2 ***/
-/*void
+// /*** exercise 5.2 ***/
+void
 ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
 {
 	// Your code here
@@ -95,7 +95,7 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
     u_int offset_end = offset_begin + nsecs * 0x200;
     u_int offset = 0;
 	u_int ide_addr = 0x13000000;
-    u_char write_mode = 1;
+    u_int write_mode = 1;
     u_int status = 0;
     
     // DO NOT DELETE WRITEF !!!
@@ -131,7 +131,8 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
         }
         offset += 0x200;
     }
-}*/
+}
+/*
 void
 ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 {
@@ -168,7 +169,7 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 	}
 }
 
-
+*/
 // Overview:
 // 	write data to IDE disk.
 //
@@ -183,7 +184,7 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 //
 // Hint: use syscalls to access device registers and buffers
 /*** exercise 5.2 ***/
-void
+/*void
 ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
 {
 	// Your code here
@@ -221,4 +222,4 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
         }
         offset += 0x200;
 	}
-}
+}*/
