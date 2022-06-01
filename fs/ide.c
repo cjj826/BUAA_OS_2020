@@ -31,8 +31,8 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
     u_int offset_end = offset_begin + nsecs * 0x200;
     u_int offset = 0;
 	u_int ide_addr = 0x13000000;
-    u_int read_mode = 0;
-    u_int status = 0;
+    u_char read_mode = 0;
+    u_char status = 0;
     
     while (offset_begin + offset < offset_end) {
         // Your code here
@@ -48,12 +48,12 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
             user_panic("set offset failed!");
         }
         //set the read_mode
-        if (syscall_write_dev((u_int)&read_mode, ide_addr + 0x0020, 1) < 0) {//char lb
+        if (syscall_write_dev(&read_mode, ide_addr + 0x0020, 1) < 0) {//char lb
             user_panic("set read_mode failed!");
         }
         //if success?
         status = 0;
-        if (syscall_read_dev((u_int)&status, ide_addr + 0x0030, 4) < 0) {
+        if (syscall_read_dev(&status, ide_addr + 0x0030, 1) < 0) {
             user_panic("get status failed!");
         }
         if (status == 0) {
@@ -95,8 +95,8 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
     u_int offset_end = offset_begin + nsecs * 0x200;
     u_int offset = 0;
 	u_int ide_addr = 0x13000000;
-    u_int write_mode = 1;
-    u_int status = 0;
+    u_char write_mode = 1;
+    u_char status = 0;
     
     // DO NOT DELETE WRITEF !!!
     writef("diskno: %d\n", diskno);
@@ -118,12 +118,12 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
             user_panic("write failed!");
         }
         //set the write_mode
-        if (syscall_write_dev((u_int)&write_mode, ide_addr + 0x0020, 1) < 0) {//char lb
+        if (syscall_write_dev(&write_mode, ide_addr + 0x0020, 1) < 0) {//char lb
             user_panic("set read_mode failed!");
         }
         //if success?
         status = 0;
-        if (syscall_read_dev((u_int)&status, ide_addr + 0x0030, 4) < 0) {
+        if (syscall_read_dev(&status, ide_addr + 0x0030, 1) < 0) {
             user_panic("get status failed!");
         }
         if (status == 0) {
