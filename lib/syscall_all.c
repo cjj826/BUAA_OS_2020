@@ -464,15 +464,15 @@ int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
 		return -E_INVAL;
 	}
 	if (dev >= 0x10000000 && dev < 0x10000020) {
-		if (dev + len >= 0x10000020) {
+		if (dev + len > 0x10000020) {
 			return -E_INVAL;
 		}
 	} else if (dev >= 0x13000000 && dev < 0x13004200) {
-		if (dev + len >= 0x13004200) {
+		if (dev + len > 0x13004200) {
 			 return -E_INVAL;
 		}
 	} else if (dev >= 0x15000000 && dev < 0x15000200) {
-		if (dev + len >= 0x15000200) {
+		if (dev + len > 0x15000200) {
 			return -E_INVAL;
 		}
 	} else {
@@ -505,15 +505,15 @@ int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
         return -E_INVAL;
     }
 	if (dev >= 0x10000000 && dev < 0x10000020) {
-        if (dev + len >= 0x10000020) {
+        if (dev + len > 0x10000020) {
             return -E_INVAL;
         }
     } else if (dev >= 0x13000000 && dev < 0x13004200) {
-        if (dev + len >= 0x13004200) {
+        if (dev + len > 0x13004200) {
              return -E_INVAL;
         }
     } else if (dev >= 0x15000000 && dev < 0x15000200) {
-        if (dev + len >= 0x15000200) {
+        if (dev + len > 0x15000200) {
             return -E_INVAL;
         }
     } else {
