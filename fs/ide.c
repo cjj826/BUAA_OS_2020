@@ -185,6 +185,51 @@ int raid4_read(u_int blockno, void *dst) {
 		return invalid;
 	} else {
 		//
+		if (raid4_valid(5) == 0) {
+			for (i = 1; i <= 4; i++) {//
+				base_offset = (i - 1) * 0x200;
+				for (j = 0; j <= 1; j++) {
+					ide_read(i, j + bs, dst + base_offset + 512 * 4 * j, 1);//
+				}
+			}
+		} else {
+			char buf1[3][512], buf2[3][512], old[512];
+			char buf[512];
+			u_int t1 = 0, t2 = 0;
+			u_int me;
+			for (i = 1; i <= 4; i++) {
+				if (raid4_valid(i) == 0) {
+					me = i;
+					continue;
+				}
+				base_offset = (i - 1) * 0x200;
+                for (j = 0; j <= 1; j++) {
+                    ide_read(i, j + bs, dst + base_offset + 512 * 4 * j, 1);//
+					if (j == 0) {
+						user_bzero(buf1[t1], 512);
+						user_bcopy(dst + base_offset + 512 * 4 * j, buf1[t1], 512);
+						t1++;
+					} else {
+						user_bzero(buf2[t2], 512);
+						user_bcopy(dst + base_offset + 512 * 4 * j, buf2[t2], 512);
+                        t2++;
+					}
+				}
+			}
+			for (i = 0; i <= 1; i++) {
+				user_bzero(old, 512);
+				user_bzero(buf, 512);
+				ide_read(5, i + bs, old, 1);
+				for (j = 0; j < 512; j++) {
+					if (i == 0) {
+						buf[j] = buf1[0][j] ^ buf1[1][j] ^ buf1[2][j] ^ old[j];
+					} else {
+						buf[j] = buf2[0][j] ^ buf2[1][j] ^ buf2[2][j] ^ old[j];
+					}
+				}
+				user_bcopy(buf, dst + (me - 1) * 0x200 + 512 * 4 * i, 512);
+			}
+		}
 		return 1;
 	}
 
