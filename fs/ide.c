@@ -72,6 +72,124 @@ void raid0_read(u_int secno, void *dst, u_int nsecs) {
     }
 
 }
+int raid4_valid(u_int diskno) {
+	u_int ide_addr = 0x13000000;
+	if (syscall_write_dev((u_int)&diskno, ide_addr + 0x0010, 4) < 0) {
+        user_panic("set diskno failed!");
+    }
+	u_int now_offset = 0;
+        //set the offset
+    if (syscall_write_dev((u_int)&now_offset, ide_addr + 0x0, 4) < 0) {
+        user_panic("set offset failed!");
+	}
+	u_char read_mode = 0;
+        //set the read_mode
+    if (syscall_write_dev(&read_mode, ide_addr + 0x0020, 1) < 0) {//char lb
+        user_panic("set read_mode failed!");
+	}
+        //if success?
+    u_char status = 0;
+    if (syscall_read_dev(&status, ide_addr + 0x0030, 1) < 0) {
+       user_panic("get status failed!");
+    }
+    if (status == 0) {
+		return 0;    
+	}
+	return 1;
+}
+
+void user_bxor(const void *src, void *dst) {
+	int i;
+	char * data = (char *) src;
+	char * d = (char *) dst;
+	for (i = 0; i < 512; i++) {
+		d[i] = data[i] ^ data[i+512] ^ data[i + 512 * 2] ^ data[i + 512*3];
+	}
+}
+
+int user_cmp(void * a, void * b) {
+	int i;
+	char *c = (char *) a;
+	char *d = (char *) b;
+	for (i = 0; i < 512; i++) {
+		if (c[i] != d[i]) {
+			break;
+		}
+	}
+	if (i == 512) {
+		return 1;
+	}
+	return 0;
+}
+	
+int raid4_write(u_int blockno, void *src) {
+	u_int i, j;
+	u_int bs = blockno * 2;
+	u_int base_offset;
+	u_int useless = 0;
+	for (i = 1; i <= 4; i++) {//
+		if (raid4_valid(i) == 0) {
+			useless++;
+			continue;
+		}
+		base_offset = (i - 1) * 0x200;
+		for (j = 0; j <= 1; j++) {
+			ide_write(i, j + bs, src + base_offset + 512 * 4 * j, 1);//
+		}
+	}
+	if (raid4_valid(5) == 0) {
+		useless++;
+	} else {
+		char buf[512];
+		for (i = 0; i <= 1; i++) {
+			user_bzero(buf, 512);
+			user_bxor(src + i * 512 * 4, buf);
+			ide_write(5, bs + i, buf, 1);
+		}
+	}
+	
+	return useless;
+}
+int raid4_read(u_int blockno, void *dst) {
+	u_int invalid = 0;
+	u_int i;
+	for (i = 1; i <= 5; i++) {
+		if (raid4_valid(i) == 0) {
+			invalid++;
+		}
+	}
+	u_int j;
+    u_int bs = blockno * 2;
+    u_int base_offset;
+    u_int useless = 0;
+	if (invalid == 0) {
+		for (i = 1; i <= 4; i++) {//
+			base_offset = (i - 1) * 0x200;
+			for (j = 0; j <= 1; j++) {
+				ide_read(i, j + bs, dst + base_offset + 512 * 4 * j, 1);//
+			}
+		}
+		char buf[512];
+		char old[512];
+        for (i = 0; i <= 1; i++) {
+            user_bzero(buf, 512);
+			user_bzero(old, 512);
+            //ide_read(5, i + bs, buf, 1);
+			user_bxor(dst + i * 512 * 4, buf);
+			ide_read(5, i + bs, old, 1);
+            if (user_cmp(buf, old)) {
+				return 0;
+			} else return -1;
+        }
+	} else if (invalid > 1) {
+		return invalid;
+	} else {
+		//
+		return 1;
+	}
+
+}
+
 
 void
 ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
