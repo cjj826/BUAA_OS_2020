@@ -13,8 +13,8 @@ void mips_init() {
 	page_init();
 
 	env_init();
-
-	ENV_CREATE(user_devtst);
+	ENV_CREATE(fs_exam);
+	//ENV_CREATE(user_devtst);
 	// ENV_CREATE(user_fstest);
 	 //ENV_CREATE(fs_serv);
  

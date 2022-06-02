@@ -22,6 +22,56 @@
 //
 // Hint: use syscalls to access device registers and buffers
 /*** exercise 5.2 ***/
+int time_read() {
+	int addr = 0x15000000;
+	int offset = 0x0010;
+
+	int time;
+	//bcopy(&time, addr+0x0, 4);
+	//bcopy(addr+offset, &time, 4);
+	syscall_write_dev(&time, addr+0x0, 4);
+	syscall_read_dev(&time, addr+offset, 4);
+	return time;
+}
+void raid0_write(u_int secno, void *src, u_int nsecs) {
+	u_int offset_begin = secno * 0x200;
+    u_int offset_end = offset_begin + nsecs * 0x200;
+    u_int offset = 0;
+    //u_int ide_addr = 0x13000000;
+    //u_char write_mode = 1;
+    //u_char status = 0;
+	u_int num = 0;
+
+	while (offset_begin + offset < offset_end) {
+		u_int now = secno + num;
+		u_int k = now / 2;
+		u_int tar = (now % 2) ? 2 : 1;
+		ide_write(tar, k, src + offset, 1);
+		num++;
+		offset += 0x200;
+	}
+
+}
+
+void raid0_read(u_int secno, void *dst, u_int nsecs) {
+    u_int offset_begin = secno * 0x200;
+    u_int offset_end = offset_begin + nsecs * 0x200;
+    u_int offset = 0;
+    //u_int ide_addr = 0x13000000;
+    //u_char write_mode = 1;
+    //u_char status = 0;
+    u_int num = 0;
+
+    while (offset_begin + offset < offset_end) {
+        u_int now = secno + num;
+        u_int k = now / 2;
+        u_int tar = (now % 2) ? 2 : 1;
+        ide_read(tar, k, dst + offset, 1);
+        num++;
+        offset += 0x200;
+    }
+
+}
 
 void
 ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
