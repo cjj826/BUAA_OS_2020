@@ -17,7 +17,7 @@ u_int
 diskaddr(u_int blockno)
 {
 	u_int offset;
-	if (super && blockno > super->s_nblocks)
+	if (super && blockno >= super->s_nblocks) //big bug !
 	{
 		user_panic("diskaddr() : blockno is too large!");
 	}
