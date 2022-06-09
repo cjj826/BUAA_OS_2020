@@ -129,6 +129,7 @@ void umain()
     writef("read from new file: %s\n", buf);
     while(1);
 }*/
+
 #include "lib.h"
 
 
@@ -136,11 +137,16 @@ void umain()
 {
     int fdnum;
     char buf[512];
+	char buf1[512];
     list_dir("/", buf);
     writef("dir of / : %s\n", buf);
     fdnum = open("/created_file", O_RDWR|O_CREAT);
+    fwritef(fdnum, "test create");
     close(fdnum);
-    list_dir("/", buf);
+    fdnum = open("/created_file", O_RDWR);
+    read(fdnum, buf1, 150);
+    writef("read from new file: %s\n", buf1);
+	list_dir("/", buf);
     writef("dir of / : %s\n", buf);
     while(1);
 }

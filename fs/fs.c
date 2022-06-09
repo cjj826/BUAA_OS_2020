@@ -764,7 +764,7 @@ file_create(char *path, struct File **file)
 	if (dir_alloc_file(dir, &f) < 0) {
 		return r;
 	}
-
+	//writef("create a %s\n", name);
 	strcpy((char *)f->f_name, name);
 	*file = f;
 	return 0;

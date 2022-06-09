@@ -54,6 +54,7 @@ open(const char *path, int mode)
 	ffd = (struct Filefd *)fd;
 	fileid = ffd->f_fileid;
 	size = ffd->f_file.f_size;
+	//writef("size is : %d\n", size);
 	if (mode & O_APPEND) ffd->f_fd.fd_offset = size;
 
 	// Step 4: Alloc memory, map the file content into memory.
@@ -92,23 +93,28 @@ int list_dir(const char* path, char* ans) {
 	ffd = (struct Filefd *) fd;
 	size = ffd->f_file.f_size;
 	u_int n = ROUND(size, sizeof(struct File)) / sizeof(struct File);
+	//writef("file: %d\n", n);
 	f = (struct File *) va;
 	u_int l;
 	u_int t = 0;
 	for (i = 0; i < n; i++) {
-		f = f + i;
-		if (f->f_name[0] == '\0') {
+		
+		//writef("file: %s\n", f->f_name);
+		if (f[i].f_name[0] == '\0') {
 			continue;
 		}
-		l = strlen(f->f_name);
+		//writef("file: %s\n", f->f_name);
+		l = strlen(f[i].f_name);
 		u_int k;
 		if (t) {
 		   ans[t++] = ' ';
 		}
 		for (k = 0; k < l; k++) {
-			ans[t++] = f->f_name[k];
+			ans[t++] = f[i].f_name[k];
 		}
 	}
+	ans[t] = '\0';
+	close(fdnum);
 	return 0;
 }
 
