@@ -52,6 +52,21 @@ fsipc_open(const char *path, u_int omode, struct Fd *fd)
 	req->req_omode = omode;
 	return fsipc(FSREQ_OPEN, req, (u_int)fd, &perm);
 }
+int fsipc_list_dir(const char *path, char **ans) {
+	struct Fsreq_list_dir *req;
+
+	req = (struct Fsreq_list_dir *)fsipcbuf;
+	if (strlen(path) >= MAXPATHLEN) {
+        return -E_BAD_PATH;
+    }
+
+    strcpy((char *)req->req_path, path);
+	//syscall_mem_map(0, (u_int)*ans, 0, (u_int) *ans, PTE_V|PTE_R);
+	//syscall_mem_unmap(0, (u_int)*ans);
+
+	return fsipc(FSREQ_LIST_DIR, req, *ans, PTE_V|PTE_R);
+}
+
 
 // Overview:
 //	Make a map-block request to the file server. We send the fileid and
@@ -149,4 +164,3 @@ fsipc_sync(void)
 {
 	return fsipc(FSREQ_SYNC, fsipcbuf, 0, 0);
 }
-

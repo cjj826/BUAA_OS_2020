@@ -182,6 +182,12 @@ serve_map(u_int envid, struct Fsreq_map *rq)
 	ipc_send(envid, 0, (u_int)blk, perm);
 }
 
+void serve_list_dir(u_int envid, struct Fsreq_list_dir *rq) {
+	char *srcva;
+	int r = file_list_dir(rq->req_path, &srcva);
+	ipc_send(envid, r, srcva, PTE_V | PTE_R);
+}
+
 void
 serve_set_size(u_int envid, struct Fsreq_set_size *rq)
 {
@@ -311,6 +317,10 @@ serve(void)
 
 			case FSREQ_SYNC:
 				serve_sync(whom);
+				break;
+
+			case FSREQ_LIST_DIR:
+				serve_list_dir(whom, (struct Fsreq_list_dir *)REQVA);
 				break;
 
 			default:

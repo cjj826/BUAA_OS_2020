@@ -66,6 +66,48 @@ open(const char *path, int mode)
 	return fd2num(fd);
 
 }
+/*
+int list_dir(const char* path, char* ans) {
+	int r;
+	r = fsipc_list_dir(path, &ans);
+	if (r < 0) return r;
+	return 0;
+}*/
+
+int list_dir(const char* path, char* ans) {
+	int r;
+	struct Fd *fd;
+    struct Filefd *ffd;
+	struct File *f;
+    u_int size, fileid;
+    //int r;
+    u_int va;
+    u_int i;
+	int fdnum = open(path, O_RDONLY);
+	if (fdnum < 0) {
+		return -1;
+	}
+	fd = num2fd(fdnum);
+	va = fd2data(fd);
+	ffd = (struct Filefd *) fd;
+	size = ffd->f_file.f_size;
+	u_int n = ROUND(size, sizeof(struct File)) / sizeof(struct File);
+	f = (struct File *) va;
+	u_int l;
+	u_int t = 0;
+	for (i = 0; i < n ; i++) {
+		f = f + i;	
+		l = strlen(f->f_name);
+		u_int k;
+		if (t) {
+		   ans[t++] = ' ';
+		 }
+		for (k = 0; k < l; k++) {
+			ans[t++] = f->f_name[k];
+		 }
+	}
+	return 0;
+}
 
 // Overview:
 //	Close a file descriptor

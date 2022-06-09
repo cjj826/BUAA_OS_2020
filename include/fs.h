@@ -62,10 +62,16 @@ struct Super {
 #define FSREQ_DIRTY	5
 #define FSREQ_REMOVE	6
 #define FSREQ_SYNC	7
+#define FSREQ_LIST_DIR 8
 
 struct Fsreq_open {
 	char req_path[MAXPATHLEN];
 	u_int req_omode;
+};
+
+struct Fsreq_list_dir {
+	char req_path[MAXPATHLEN];
+	char ** req_ans;
 };
 
 struct Fsreq_map {
