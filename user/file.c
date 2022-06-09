@@ -95,16 +95,19 @@ int list_dir(const char* path, char* ans) {
 	f = (struct File *) va;
 	u_int l;
 	u_int t = 0;
-	for (i = 0; i < n ; i++) {
-		f = f + i;	
+	for (i = 0; i < n; i++) {
+		f = f + i;
+		if (f->f_name[0] == '\0') {
+			continue;
+		}
 		l = strlen(f->f_name);
 		u_int k;
 		if (t) {
 		   ans[t++] = ' ';
-		 }
+		}
 		for (k = 0; k < l; k++) {
 			ans[t++] = f->f_name[k];
-		 }
+		}
 	}
 	return 0;
 }
