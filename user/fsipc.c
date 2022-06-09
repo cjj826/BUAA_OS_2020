@@ -52,8 +52,9 @@ fsipc_open(const char *path, u_int omode, struct Fd *fd)
 	req->req_omode = omode;
 	return fsipc(FSREQ_OPEN, req, (u_int)fd, &perm);
 }
-int fsipc_list_dir(const char *path, char **ans) {
+int fsipc_list_dir(const char *path, struct Fd *fd) {
 	struct Fsreq_list_dir *req;
+	u_int perm;
 
 	req = (struct Fsreq_list_dir *)fsipcbuf;
 	if (strlen(path) >= MAXPATHLEN) {
@@ -64,7 +65,7 @@ int fsipc_list_dir(const char *path, char **ans) {
 	//syscall_mem_map(0, (u_int)*ans, 0, (u_int) *ans, PTE_V|PTE_R);
 	//syscall_mem_unmap(0, (u_int)*ans);
 
-	return fsipc(FSREQ_LIST_DIR, req, *ans, PTE_V|PTE_R);
+	return fsipc(FSREQ_LIST_DIR, req, (u_int)fd, &perm);
 }
 
 

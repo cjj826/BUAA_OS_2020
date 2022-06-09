@@ -769,53 +769,31 @@ file_create(char *path, struct File **file)
 	*file = f;
 	return 0;
 }
-int file_list_dir(char *path, char **ans) {
-	char name[MAXNAMELEN];
+int file_list_dir(struct File *dir, char *buf) {
 	int r;
-	struct File *dir, *f;
-
-	if ((r = walk_path(path, &dir, &f, name)) == -E_NOT_FOUND) {
-		return -1;
-	}
-	
-	dir = f;
 	u_int i, j, nblock;
 	void *blk;
-	u_int l;
-	u_int t = 0;
-	char * a;
-	nblock = ROUND(dir->f_size, BY2BLK) / BY2BLK;
+	struct File *f;
 
-	for (i = 0; i < nblock; i++) { //遍历文件中所有的磁盘块filebno，目的是对应找到指针
-		r = file_get_block(dir, i, &blk);
-		//if (r < 0)
-		//{
-		//	return r;
-		//}
-		// Step 3: Find target file by file name in all files on this block.
-		// If we find the target file, set the result to *file and set f_dir field.
-		for (j = 0; j < FILE2BLK; j++) { 
+	nblock = ROUND(dir -> f_size, BY2BLK) / BY2BLK;
+
+	for (i = 0; i < nblock; i++) {
+		if ((r = file_get_block(dir, i, &blk))) return r;
+        
+		for (j = 0; j < FILE2BLK; j++) {
 			f = ((struct File *)blk) + j;
-		/*	if (strcmp(f->f_name, name) == 0)
-			{
-				f->f_dir = dir;
-				*file = f;
-				return 0;
-			}*/
-			l = strlen(f->f_name);
-			u_int k;
-			if (t) {
-				a[t++] = ' ';
-			}
-			for (k = 0; k < l; k++) {
-				a[t++] = f->f_name[k];
-			}
+            
+            strcpy(buf, f -> f_name);
+            buf += strlen(f -> f_name);
+            *buf = ' ';
+            ++buf;
 		}
 	}
-	*ans = a;
+    
+    *buf = 0;
+
 	return 0;
 }
-
 // Overview:
 //	Truncate file down to newsize bytes.
 // 	Since the file is shorter, we can free the blocks that were used by the old

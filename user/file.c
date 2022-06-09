@@ -67,14 +67,37 @@ open(const char *path, int mode)
 	return fd2num(fd);
 
 }
-/*
-int list_dir(const char* path, char* ans) {
-	int r;
-	r = fsipc_list_dir(path, &ans);
-	if (r < 0) return r;
-	return 0;
-}*/
 
+int list_dir(const char* path, char* ans) {
+	struct Fd *fd;
+    int r;
+    int i;
+    
+    char *buf;
+    
+    r = fd_alloc(&fd);
+	if (r < 0) {
+		return r;
+	}
+    
+    r = fsipc_list_dir(path, fd);
+    
+    if (r < 0) {
+        return -1;
+    }
+    
+    buf = fd;
+    
+    for (i = 0; i < 4096; i++) {
+        ans[i] = buf[i];
+        if (ans[i] == 0) {
+            break;
+        }
+    }
+    
+    return 0;
+}
+/*
 int list_dir(const char* path, char* ans) {
 	int r;
 	struct Fd *fd;
@@ -117,7 +140,7 @@ int list_dir(const char* path, char* ans) {
 	close(fdnum);
 	return 0;
 }
-
+*/
 // Overview:
 //	Close a file descriptor
 int

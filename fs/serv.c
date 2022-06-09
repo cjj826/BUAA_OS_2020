@@ -183,9 +183,37 @@ serve_map(u_int envid, struct Fsreq_map *rq)
 }
 
 void serve_list_dir(u_int envid, struct Fsreq_list_dir *rq) {
-	char *srcva;
+	/*char *srcva;
 	int r = file_list_dir(rq->req_path, &srcva);
-	ipc_send(envid, r, srcva, PTE_V | PTE_R);
+	ipc_send(envid, r, srcva, PTE_V | PTE_R);*/
+	u_char path[MAXPATHLEN];
+	struct File *f;
+	struct Filefd *ff;
+	int fileid;
+	int r;
+	struct Open *o;
+
+    char *buf;
+
+    user_bcopy(rq->req_path, path, MAXPATHLEN);
+	path[MAXPATHLEN - 1] = 0;
+
+    if ((r = open_alloc(&o)) < 0) {
+		user_panic("open_alloc failed: %d, invalid path: %s", r, path);
+		ipc_send(envid, r, 0, 0);
+	}
+
+    r = walk_path(path, 0, &f, 0);
+
+    if (r < 0) {
+        ipc_send(envid, r, 0, 0);
+    }
+
+    buf = (u_int)o->o_ff;
+
+    r = file_list_dir(f, buf);
+
+    ipc_send(envid, r, (u_int)o->o_ff, PTE_V | PTE_R);
 }
 
 void
