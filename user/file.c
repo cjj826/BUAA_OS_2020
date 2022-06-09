@@ -54,6 +54,7 @@ open(const char *path, int mode)
 	ffd = (struct Filefd *)fd;
 	fileid = ffd->f_fileid;
 	size = ffd->f_file.f_size;
+	if (mode & O_APPEND) ffd->f_fd.fd_offset = size;
 
 	// Step 4: Alloc memory, map the file content into memory.
 	for (i = 0; i < size; i += BY2BLK) {

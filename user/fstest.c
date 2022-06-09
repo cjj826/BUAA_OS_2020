@@ -1,4 +1,4 @@
-#include "lib.h"
+/*#include "lib.h"
 
 static char *msg = "This is the NEW message of the day!\n\n";
 static char *diff_msg = "This is a different massage of the day!\n\n";
@@ -68,4 +68,64 @@ void umain()
         }
 }
 
+*/
+/*
+#include "lib.h"
 
+
+void umain()
+{
+    int r, fdnum, n;
+    char buf[200];
+    if ((r = open("/newmotd", O_RDWR | O_APPEND) < 0)) {
+	    user_panic("open /motd: %d\n", r);
+    }
+    fdnum = r;
+    if (r = fwritef(fdnum, "test append") < 0) {
+	    user_panic("fwritef %d\n", r);
+    }
+    close(fdnum);
+    if ((r = open("/newmotd", O_RDWR) < 0)) {
+	    user_panic("open /motd: %d\n", r);
+    }
+    fdnum = r;
+    if ((n = read(fdnum, buf, 150)) < 0) {
+	    writef("read %d\n", n);
+	    return;
+    }
+    close(fdnum);
+    writef("\n%s\n", buf);
+    while (1);
+}*/
+/*#include "lib.h"
+
+
+void umain()
+{
+    int r, fdnum, n;
+    char buf[200];
+    fdnum = open("/newmotd", O_RDWR | O_ALONE);
+    if ((r = fork()) == 0) {
+	    n = read(fdnum, buf, 5);
+	    writef("[child] buffer is \'%s\'\n", buf);
+    } else {
+	    n = read(fdnum, buf, 5);
+	    writef("[father] buffer is \'%s\'\n", buf);
+    }
+    while(1);
+}*/
+#include "lib.h"
+
+
+void umain()
+{
+    int fdnum;
+    char buf[200];
+    fdnum = open("/created_file", O_RDWR|O_CREAT);
+    fwritef(fdnum, "test create");
+    close(fdnum);
+    fdnum = open("/created_file", O_RDWR);
+    read(fdnum, buf, 150);
+    writef("read from new file: %s\n", buf);
+    while(1);
+}
