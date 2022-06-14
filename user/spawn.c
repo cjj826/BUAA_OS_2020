@@ -98,10 +98,116 @@ int usr_is_elf_format(u_char *binary){
     return 0;
 }
 
+#define BUFPAGE (0x40000000)
+
 int 
 usr_load_elf(int fd , Elf32_Phdr *ph, int child_envid){
 	//Hint: maybe this function is useful 
 	//      If you want to use this func, you should fill it ,it's not hard
+    u_int va = ph->p_vaddr;
+	u_int sgsize = ph->p_memsz;
+	u_int bin_size = ph->p_filesz;
+	u_int file_offset = ph->p_offset;
+	u_char buf[BY2PG];
+	u_int i = 0;
+	//writef("va : %x bin_size : %d sgsize : %d child: %x\n", va, bin_size, sgsize, child_envid);
+	int r;
+	u_int offset = va + i - ROUNDDOWN(va + i, BY2PG);
+	int size;
+	if (offset)
+	{
+		r = syscall_mem_alloc(child_envid, va + i, PTE_V | PTE_R);
+		if (r < 0)
+		{
+			return r;
+		}
+		size = MIN(bin_size - i, BY2PG - offset);
+		r = seek(fd, file_offset + i);
+		if (r < 0)
+		{
+			return r;
+		}
+		r = readn(fd, buf, size);
+		if (r < 0)
+		{
+			return r;
+		}
+		r = syscall_mem_map(child_envid, va + i, 0, BUFPAGE, PTE_V | PTE_R);
+		if (r < 0)
+		{
+			return r;
+		}
+		user_bcopy((void*)buf, (void*)(BUFPAGE + offset), size);
+		r = syscall_mem_unmap(0, BUFPAGE);
+		if (r < 0)
+		{
+			return r;
+		}
+		i = i + size;
+	}
+	//writef("__1__\n");
+	while (i < bin_size)
+	{
+		size = MIN(BY2PG, bin_size - i);
+		r = syscall_mem_alloc(child_envid, va + i, PTE_V | PTE_R);
+		if (r < 0)
+		{
+			return r;
+		}
+		size = MIN(bin_size - i, BY2PG);
+		r = seek(fd, file_offset + i);
+		if (r < 0)
+		{
+			return r;
+		}
+		r = readn(fd, buf, size);
+		if (r < 0)
+		{
+			return r;
+		}
+		r = syscall_mem_map(child_envid, va + i, 0, BUFPAGE, PTE_V | PTE_R);
+		if (r < 0)
+		{
+			return r;
+		}
+		user_bcopy((void*)buf, (void*)BUFPAGE, size);
+		r = syscall_mem_unmap(0, BUFPAGE);
+		if (r < 0)
+		{
+			return r;
+		}
+		i += size;
+	}
+	//writef("__2__\n");
+	offset = va + i - ROUNDDOWN(va + i, BY2PG);
+	if (offset)
+	{
+		size = MIN(sgsize - i, BY2PG - offset);
+		r = syscall_mem_map(child_envid, va + i, 0, BUFPAGE, PTE_V | PTE_R);
+		if (r < 0)
+		{
+			return r;
+		}
+		user_bzero((void*)(BUFPAGE + offset), size);
+		r = syscall_mem_unmap(0, BUFPAGE);
+		if (r < 0)
+		{
+			return r;
+		}
+		i = i + size;
+	}
+	//writef("__3__\n");
+	while (i < sgsize) 
+	{
+		size = MIN(BY2PG, sgsize - i);
+		r = syscall_mem_alloc(child_envid, va + i, PTE_V | PTE_R);
+		if (r < 0)
+		{
+			return r;
+		}
+		i += size;
+	}
+	//writef("__4__\n");
 	return 0;
 }
 
@@ -116,26 +222,70 @@ int spawn(char *prog, char **argv)
 	u_int esp;
 	Elf32_Ehdr* elf;
 	Elf32_Phdr* ph;
+    Elf32_Ehdr *ehdr;
+    Elf32_Phdr* phdr;
 	// Note 0: some variable may be not used,you can cancel them as you like
 	// Step 1: Open the file specified by `prog` (prog is the path of the program)
 	if((r=open(prog, O_RDONLY))<0){
 		user_panic("spawn ::open line 102 RDONLY wrong !\n");
 		return r;
 	}
+    fd = r;
 	// Your code begins here
-	// Before Step 2 , You had better check the "target" spawned is a execute bin 
+	// Before Step 2 , You had better check the "target" spawned is a execute bin
 	// Step 2: Allocate an env (Hint: using syscall_env_alloc())
 	// Step 3: Using init_stack(...) to initialize the stack of the allocated env
 	// Step 3: Map file's content to new env's text segment
 	//        Hint 1: what is the offset of the text segment in file? try to use objdump to find out.
 	//        Hint 2: using read_map(...)
-	//		  Hint 3: Important!!! sometimes ,its not safe to use read_map ,guess why 
+	//		  Hint 3: Important!!! sometimes ,its not safe to use read_map ,guess why
 	//				  If you understand, you can achieve the "load APP" with any method
 	// Note1: Step 1 and 2 need sanity check. In other words, you should check whether
 	//       the file is opened successfully, and env is allocated successfully.
 	// Note2: You can achieve this func in any way ，remember to ensure the correctness
-	//        Maybe you can review lab3 
+	//        Maybe you can review lab3
 	// Your code ends here
+
+    if ((r = read(fd, elfbuf, sizeof(Elf32_Ehdr)) < 0)) {
+        user_panic("spawn ::read fail !\n");
+        return r;
+    }
+    ehdr = (Elf32_Ehdr*)elfbuf;
+    if (!usr_is_elf_format((u_char*)ehdr)) {
+        user_panic("spawn ::not a elf file !\n");
+        return -1;
+    }
+    if ((child_envid = syscall_env_alloc()) < 0) {
+        user_panic("spawn ::env alloc fail !\n");
+        return child_envid;
+    }
+
+    if ((r = init_stack(child_envid, argv, &esp)) < 0) {
+        user_panic("spawn ::init_stack fail !\n");
+        return r;
+    }
+
+    u_int count = ehdr->e_phnum;
+    text_start = ehdr->e_phoff;
+    u_int entry_size = ehdr->e_phentsize;
+
+    for (i = 0; i < count; i++) {
+        if ((r = seek(fd, text_start)) < 0) {
+            user_panic("seek failed!");
+        }
+        if ((r = readn(fd, elfbuf, entry_size)) < 0) {
+            user_panic("readn failed!");
+        }
+        phdr = (Elf32_Phdr *)elfbuf;
+        if (phdr->p_type == PT_LOAD) {
+            if ((r = usr_load_elf(fd, phdr, child_envid)) < 0) {
+                user_panic("load faild %d!", r);
+            }
+        }
+        text_start += entry_size;
+    }
+    size = 0;
+
 
 	struct Trapframe *tf;
 	writef("\n::::::::::spawn size : %x  sp : %x::::::::\n",size,esp);
@@ -177,7 +327,7 @@ int spawn(char *prog, char **argv)
 		writef("set child runnable is wrong\n");
 		return r;
 	}
-	return child_envid;		
+	return child_envid;
 
 }
 

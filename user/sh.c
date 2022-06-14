@@ -104,14 +104,35 @@ again:
 				writef("syntax error: < not followed by word\n");
 				exit();
 			}
+			if ((fdnum = open(t, O_RDONLY)) < 0) {
+                writef(" < open error");
+                exit();
+            }
+            if ((r = dup(fdnum, 0)) < 0) {
+                writef(" < dup error");
+                exit();
+            }
+            close(fdnum);
 			// Your code here -- open t for reading,
 			// dup it onto fd 0, and then close the fd you got.
-			user_panic("< redirection not implemented");
+			//user_panic("< redirection not implemented");
 			break;
 		case '>':
+			if(gettoken(0, &t) != 'w'){
+				writef("syntax error: < not followed by word\n");
+				exit();
+			}
 			// Your code here -- open t for writing,
 			// dup it onto fd 1, and then close the fd you got.
-			user_panic("> redirection not implemented");
+            if ((fdnum = open (t, O_WRONLY)) < 0) {
+                writef(" > open error");
+                exit();
+            }
+            if ((r = dup(fdnum, 1)) < 0) {
+                writef(" > dup error");
+                exit();
+            }
+            close(fdnum);
 			break;
 		case '|':
 			// Your code here.
@@ -129,7 +150,33 @@ again:
 			//		set "rightpipe" to the child envid
 			//		goto runit, to execute this piece of the pipeline
 			//			and then wait for the right side to finish
-			user_panic("| not implemented");
+			if ((r = pipe(p)) < 0) {
+                writef("| pipe error");
+                exit();
+            }
+            if ((r = fork()) < 0) {
+                writef("| fork error");
+                exit();
+            }
+            if (r == 0) {
+                if ((r = dup(p[0], 0)) < 0) {
+                    writef("| child dup error");
+                    exit();
+                }
+                close(p[0]);
+                close(p[1]);
+                goto again;
+            }else {
+                rightpipe = r;
+                if ((r = dup(p[1], 1)) < 0) {
+                    writef("| father dup error");
+                    exit();
+                }
+                close(p[0]);
+                close(p[1]);
+                goto runit;
+            }
+			//user_panic("| not implemented");
 			break;
 		}
 	}

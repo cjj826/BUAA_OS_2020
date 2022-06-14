@@ -143,13 +143,27 @@ dup(int oldfdnum, int newfdnum)
 	newfd = (struct Fd *)INDEX2FD(newfdnum);
 	ova = fd2data(oldfd);
 	nva = fd2data(newfd);
+	
+	if ((* vpd)[PDX(ova)]) {
+        for (i = 0; i < PDMAP; i += BY2PG) {
+            pte = (* vpt)[VPN(ova + i)];
+
+            if (pte & PTE_V) {
+                // should be no error here -- pd is already allocated
+                if ((r = syscall_mem_map(0, ova + i, 0, nva + i,
+                                         pte & (PTE_V | PTE_R | PTE_LIBRARY))) < 0) {
+                    goto err;
+                }
+            }
+        }
+    }
 
 	if ((r = syscall_mem_map(0, (u_int)oldfd, 0, (u_int)newfd,
 							 ((*vpt)[VPN(oldfd)]) & (PTE_V | PTE_R | PTE_LIBRARY))) < 0) {
 		goto err;
 	}
 
-	if ((* vpd)[PDX(ova)]) {
+	/*if ((* vpd)[PDX(ova)]) {
 		for (i = 0; i < PDMAP; i += BY2PG) {
 			pte = (* vpt)[VPN(ova + i)];
 
@@ -161,7 +175,7 @@ dup(int oldfdnum, int newfdnum)
 				}
 			}
 		}
-	}
+	}*/
 
 	return newfdnum;
 
