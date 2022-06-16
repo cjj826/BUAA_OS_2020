@@ -1,0 +1,11 @@
+[33m[01m[05m[ You are changing the branch: lab0-2-exam ][0m
+Autotest: Begin at Thu Jun 16 14:20:04 CST 2022
+gcc -c hello_os.c -o hello_os.o
+[32m[ You have passed make test ][0m
+rm hello_os.o
+[32m[ You have passed make clean test ][0m
+gcc -c hello_os.c -o hello_os.o
+[32m[ You have passed file test ][0m
+[32m[ You have passed ack test ][0m
+[33m[01m[ You got 100 (of 100) this time. Thu Jun 16 14:20:07 CST 2022 ][0m
+Autotest: End at Thu Jun 16 14:20:07 CST 2022
