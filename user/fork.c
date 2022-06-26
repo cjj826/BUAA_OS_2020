@@ -174,7 +174,8 @@ fork(void)
 	//set_pgfault_handler(pgfault);
     if (newenvid == 0) {
         env = envs + ENVX(syscall_getenvid());
-        return 0;
+        tcb = &env->env_threads[0];
+		return 0;
     }
 	
 	for (i = 0; i < VPN(USTACKTOP); i++) {
