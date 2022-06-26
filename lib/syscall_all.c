@@ -110,21 +110,25 @@ int sys_thread_destroy(int sysno, u_int threadid)
 {
 	int r;
 	struct Tcb *t;
-	if ((r = threadid2tcb(threadid,&t)) < 0) {
+	if ((r = threadid2tcb(threadid, &t)) < 0) {
 		return r;
 	}
 
     if (t->tcb_status == ENV_FREE) {
 		return -E_INVAL;
 	}
+	
+	//printf("pointer is %x", t->tcb_exit_ptr);
+	//printf("going to des\n");
 	//t->tcb_exit_value = 0;
 	struct Tcb *tmp = t->tcb_joined;
-    t->tcb_joined = NULL;
+    if (t->tcb_joined != NULL) {
+		t->tcb_joined = NULL;
+		*(tmp->tcb_join_value_ptr) = t->tcb_exit_ptr;
+		sys_set_thread_status(0, tmp->thread_id, ENV_RUNNABLE);
+	}
 
-	*(tmp->tcb_join_value_ptr) = t->tcb_exit_ptr;
-	sys_set_thread_status(0, tmp->thread_id, ENV_RUNNABLE);
-
-	printf("[%08x] destroying tcb %08x\n", curenv->env_id, t->thread_id);
+	printf("[%08x] destroying tcb %b\n", curenv->env_id, t->thread_id);
 	thread_destroy(t);
 	return 0;
 }
@@ -382,7 +386,7 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
 {
 	// Your code here.
 	struct Env *env;
-    struct Ecb *tcb;
+    struct Tcb *tcb;
 	int ret;
 	if((ret = envid2env(envid, &env, 0))) {
         return ret;
@@ -393,7 +397,7 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
     tcb = &env->env_threads[0];
     env->env_threads[0].tcb_status = status;
     if (env->env_threads[0].tcb_status == ENV_RUNNABLE) {
-        LIST_INSERT_HEAD(tcb_sched_list, tcb, tcb_sched_link);
+		LIST_INSERT_HEAD(tcb_sched_list, tcb, tcb_sched_link);
     }
 	return 0;
 	//	panic("sys_env_set_status not implemented");
@@ -401,14 +405,17 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
 
 int sys_set_thread_status(int sysno, u_int threadid, u_int status)
 {
+	//printf("begin to set %d \n", status);
 	struct Tcb *t;
 	int r;
 	if ((status != ENV_RUNNABLE)&&(status != ENV_NOT_RUNNABLE)&&(status != ENV_FREE))
 		return -E_INVAL;
-	r = threadid2tcb(threadid,&t);
+	r = threadid2tcb(threadid, &t);
 	//tcb = &env->env_threads[0];
+	//printf("r is %d\n", r);
 	if (r < 0)
 		return r;
+	//printf("thread's id is %b\n", threadid);
 	if ((status == ENV_RUNNABLE)&&(t->tcb_status != ENV_RUNNABLE)) {
 		LIST_INSERT_HEAD(tcb_sched_list,t,tcb_sched_link);
 	} else if((t->tcb_status == ENV_RUNNABLE)&&(status != ENV_RUNNABLE)) {
@@ -582,6 +589,7 @@ int sys_thread_join(int sysno, u_int threadid, void **value_ptr)
 	//printf("find id is 0x%x\n",t->thread_id);
 	if (r < 0)
 		return r;
+	printf("tcb_detach is %d\n", t->tcb_detach);
 	if (t->tcb_detach) {
 		return -E_THREAD_JOIN_FAIL;
 	}
@@ -591,12 +599,13 @@ int sys_thread_join(int sysno, u_int threadid, void **value_ptr)
 		}
 		return 0;
 	}
+	printf("ready to in joinlist!\n");
 	//printf("father id is 0x%x\n",t->thread_id);
 	//LIST_INSERT_HEAD(&t->tcb_joined_list,curtcb,tcb_joined_link);
     if (t->tcb_joined != NULL) {
         return -1;//already exist
     }
-    t->tcb_joined = &(curtcb->tcb_tf);
+    t->tcb_joined = curtcb;
     
 	curtcb->tcb_join_value_ptr = value_ptr;
 	sys_set_thread_status(0,curtcb->thread_id,ENV_NOT_RUNNABLE);

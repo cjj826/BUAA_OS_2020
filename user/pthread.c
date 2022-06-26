@@ -16,7 +16,8 @@ int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void * (*start
 	t->tcb_tf.regs[31] = exit;
 	//struct Tcb **threadtcb = (struct Tcb **)t->tcb_tf.regs[29];
 	//*threadtcb = t;
-	syscall_set_thread_status(t->thread_id,ENV_RUNNABLE);
+	syscall_set_thread_status(t->thread_id, ENV_RUNNABLE);	
+	//writef("set success!, status is %d\n", t->tcb_status);
 	*thread = t->thread_id;
 	return 0;
 }

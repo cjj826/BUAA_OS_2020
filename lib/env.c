@@ -138,9 +138,11 @@ int threadid2tcb(u_int threadid, struct Tcb **ptcb) {
 		*ptcb = curtcb;
 		return 0;
 	}
-
+	//printf("threadid is %b\n", threadid);
 	e = &envs[ENVX(threadid >> 3)];
+	//printf("env_id is %b, env_thread_count is %d\n", e->env_id, e->env_thread_count);
 	t = &e->env_threads[threadid & 0x7];
+	//printf("t->threadid is %b\n", t->thread_id);
 	if (t->tcb_status == ENV_FREE || t->thread_id != threadid) {
 		*ptcb = 0;
 		return -E_BAD_ENV;
@@ -247,7 +249,7 @@ int thread_alloc(struct Env *e, struct Tcb **new) {
 	t->tcb_canceled = 0;
 
     t->tcb_exit_value = 0;
-	t->tcb_exit_ptr = (void *)&t->tcb_exit_value;
+	//t->tcb_exit_ptr = (void *)&t->tcb_exit_value;
 	t->tcb_detach = 0;
 	//LIST_INIT(&t->tcb_joined_list);
     t->tcb_joined = NULL;
