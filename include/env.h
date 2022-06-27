@@ -31,6 +31,18 @@
 #define ENV_RUNNABLE		1
 #define ENV_NOT_RUNNABLE	2
 
+struct sem {
+	u_int sem_envid; //the env where the sem is in
+   	u_int sem_head; //the queue's head
+    u_int sem_tail; //the queue's tail
+	char sem_name[16]; //name of the sem
+	int sem_value; // value of the sem
+	int sem_shared; // 0 shows the sem is onlu used in the sem_envid
+	int sem_wait_count; //the num of the process that is blocked 
+	struct Tcb *sem_wait_queue[10]; //the queue
+};
+
+
 struct Tcb {
 	//basic information
 	struct Trapframe tcb_tf; //the tf of thread 

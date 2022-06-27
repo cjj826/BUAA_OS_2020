@@ -408,16 +408,20 @@ int sys_set_thread_status(int sysno, u_int threadid, u_int status)
 	//printf("begin to set %d \n", status);
 	struct Tcb *t;
 	int r;
-	if ((status != ENV_RUNNABLE)&&(status != ENV_NOT_RUNNABLE)&&(status != ENV_FREE))
-		return -E_INVAL;
+	if (status > 2 || status < 0) {
+        return -E_INVAL;
+    }
 	r = threadid2tcb(threadid, &t);
 	//tcb = &env->env_threads[0];
 	//printf("r is %d\n", r);
 	if (r < 0)
 		return r;
 	//printf("thread's id is %b\n", threadid);
+	//t->tcb_status = status;
+	//LIST_INSERT_HEAD(tcb_sched_list, t, tcb_sched_link);
+	
 	if ((status == ENV_RUNNABLE)&&(t->tcb_status != ENV_RUNNABLE)) {
-		LIST_INSERT_HEAD(tcb_sched_list,t,tcb_sched_link);
+		LIST_INSERT_HEAD(tcb_sched_list, t, tcb_sched_link);
 	} else if((t->tcb_status == ENV_RUNNABLE)&&(status != ENV_RUNNABLE)) {
 		LIST_REMOVE(t,tcb_sched_link);
 	}
@@ -616,3 +620,80 @@ int sys_thread_join(int sysno, u_int threadid, void **value_ptr)
 	return 0;
 }
 
+
+int sys_sem_destroy(int sysno,sem_t *sem)
+{
+	if ((sem->sem_envid != curenv->env_id) && (sem->sem_shared == 0)) {
+		return -E_SEM_NOTFOUND;
+	}
+
+	sem->sem_wait_count == -1;
+	return 0;
+}
+
+int sys_sem_wait(int sysno,sem_t *sem)
+{
+	if (sem->sem_wait_count == -1) {
+		return -E_SEM_ERROR;
+	}
+	int i;
+    sem->sem_value--;
+	if (sem->sem_value >= 0) {
+		return 0;
+	}
+	if (sem->sem_wait_count >= 10) {
+		printf("beyond limit!\n");
+		return -E_SEM_ERROR; //beyond the limit
+	}
+	sem->sem_wait_queue[sem->sem_tail] = curtcb;
+	sem->sem_tail = (sem->sem_tail + 1) % 10;
+	++sem->sem_wait_count;
+	sys_set_thread_status(0, 0, ENV_NOT_RUNNABLE);
+	struct Trapframe *trap = (struct Trapframe *)(KERNEL_SP - sizeof(struct Trapframe));
+	trap->regs[2] = 0;
+	trap->pc = trap->cp0_epc;
+	//printf("wait thread is 0x%x, now %d is wait\n",curtcb->thread_id, sem->sem_wait_count);
+	sys_yield();
+
+	return -E_SEM_ERROR;
+}
+
+int sys_sem_trywait(int sysno, sem_t *sem)
+{
+	if (sem->sem_wait_count == -1) {
+		return -E_SEM_ERROR;
+	}
+    sem->sem_value--;
+	if (sem->sem_value < 0) {
+        return -E_SEM_EAGAIN;  //
+    }
+    return 0;
+}
+
+int sys_sem_post(int sysno, sem_t *sem)
+{
+	if (sem->sem_wait_count == -1) {
+		return -E_SEM_ERROR;
+	}
+    sem->sem_value++;
+	if (sem->sem_value <= 0) {
+		struct Tcb *t;
+		sem->sem_wait_count--;
+		t = sem->sem_wait_queue[sem->sem_head];
+		sem->sem_head = (sem->sem_head + 1) % 10;
+		//printf("thread 0x%x wake!\n", t->thread_id);
+		sys_set_thread_status(0, t->thread_id, ENV_RUNNABLE);
+	}
+	return 0;
+}
+
+int sys_sem_getvalue(int sysno, sem_t *sem, int *valp)
+{
+	if (sem->sem_wait_count == -1) {
+		return -E_SEM_ERROR;
+	}
+	if (valp != 0) {
+		*valp = sem->sem_value;
+	}
+	return 0;
+}

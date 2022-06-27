@@ -85,12 +85,12 @@ int 	pthread_detach(pthread_t thread);
 int	pthread_join(pthread_t thread, void **value_ptr);
 
 int syscall_thread_join(u_int threadid, void **value_ptr);
-/*int syscall_sem_destroy(sem_t *sem);
+int syscall_sem_destroy(sem_t *sem);
 int syscall_sem_wait(sem_t *sem);
 int syscall_sem_trywait(sem_t *sem);
 int syscall_sem_post(sem_t *sem);
 int syscall_sem_getvalue(sem_t *sem,int *valp);
-*/
+
 // string.c
 int strlen(const char *s);
 char *strcpy(char *dst, const char *src);

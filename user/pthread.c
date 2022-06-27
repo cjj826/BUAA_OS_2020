@@ -9,15 +9,12 @@ int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void * (*start
 		return newthread;
 	}
 	struct Tcb *t = &env->env_threads[newthread];
-	t->tcb_tf.regs[29] = USTACKTOP - 4*BY2PG*newthread;
+	t->tcb_tf.regs[29] = USTACKTOP - 4 * BY2PG * newthread;
 	t->tcb_tf.pc = start_rountine;
 	t->tcb_tf.regs[29] -= 4;
 	t->tcb_tf.regs[4] = arg; //
 	t->tcb_tf.regs[31] = exit;
-	//struct Tcb **threadtcb = (struct Tcb **)t->tcb_tf.regs[29];
-	//*threadtcb = t;
 	syscall_set_thread_status(t->thread_id, ENV_RUNNABLE);	
-	//writef("set success!, status is %d\n", t->tcb_status);
 	*thread = t->thread_id;
 	return 0;
 }
@@ -69,6 +66,7 @@ void pthread_testcancel() {
 	}
 	if ((t->tcb_canceled)&(t->tcb_cancelstate == THREAD_CAN_BE_CANCELED)&(t->tcb_canceltype == THREAD_CANCEL_POINT)) {
 		t->tcb_exit_value = -THREAD_CANCELED_EXIT;
+		t->tcb_exit_ptr = &(t->tcb_exit_value);
 		syscall_thread_destroy(t->thread_id);
 	}
 }
@@ -82,6 +80,7 @@ int pthread_cancel(pthread_t thread) {
 		return -E_THREAD_CANNOTCANCEL;
 	}
 	t->tcb_exit_value = -THREAD_CANCELED_EXIT;
+	t->tcb_exit_ptr = &(t->tcb_exit_value);
 	if (t->tcb_canceltype == THREAD_CANCEL_IMI) {
 		syscall_thread_destroy(thread);
 	} else {

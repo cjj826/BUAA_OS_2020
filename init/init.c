@@ -24,7 +24,13 @@ void mips_init() {
 	//ENV_CREATE(user_pttest);
 	//ENV_CREATE(user_ptexittest);
 	//ENV_CREATE(user_ptcanceltest);
-	ENV_CREATE(user_ptjointest);
+	//ENV_CREATE(user_ptjointest);
+	//ENV_CREATE(user_cjjtest);
+	//ENV_CREATE(user_testsem);
+	//ENV_CREATE(user_pttest2);
+	//ENV_CREATE(user_exitjoin);
+	//ENV_CREATE(user_detachtest);
+	ENV_CREATE(user_counttest);
 	trap_init();
 	kclock_init();
 

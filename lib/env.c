@@ -517,7 +517,7 @@ env_free(struct Env *e)
 
 void thread_free(struct Tcb *t)
 {
-	struct Env *e = ROUNDDOWN(t,BY2PG);
+	struct Env *e = ROUNDDOWN(t, BY2PG);
 	printf("[%08x] free tcb %08x\n", e->env_id, t->thread_id);
 	--e->env_thread_count;
 	if (e->env_thread_count <= 0) {
@@ -549,7 +549,7 @@ env_destroy(struct Env *e)
 
 void thread_destroy(struct Tcb *t) {
 	if (t->tcb_status == ENV_RUNNABLE)
-		LIST_REMOVE(t,tcb_sched_link);
+		LIST_REMOVE(t, tcb_sched_link);
 	thread_free(t);
 	if (curtcb == t) {
 		curtcb = NULL;

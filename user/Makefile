@@ -14,12 +14,14 @@ USERLIB := printf.o \
 		syscall_lib.o \
 		ipc.o \
 		string.o \
-		pthread.o
+		pthread.o \
+		cjj-sem.o
 
 CFLAGS += -nostdlib -static
 
 all: tltest.x tltest.b \
-	ptjointest.x ptjointest.b ptcanceltest.x ptcanceltest.b pttest.x pttest.b ptexittest.x ptexittest.b \
+	counttest.x counttest.b detachtest.x detachtest.b exitjoin.x exitjoin.b pttest2.x pttest2.b \
+	testsem.x testsem.b cjjtest.x cjjtest.b ptjointest.x ptjointest.b ptcanceltest.x ptcanceltest.b pttest.x pttest.b ptexittest.x ptexittest.b \
 	fktest.x fktest.b pingpong.x pingpong.b idle.x \
 	$(USERLIB) entry.o syscall_wrap.o
 
