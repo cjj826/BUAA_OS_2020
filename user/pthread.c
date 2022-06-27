@@ -5,7 +5,7 @@
 int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void * (*start_rountine)(void *), void *arg) {
 	int newthread = syscall_thread_alloc();
 	if (newthread < 0) {
-		thread = 0;
+		*thread = 0;
 		return newthread;
 	}
 	struct Tcb *t = &env->env_threads[newthread];

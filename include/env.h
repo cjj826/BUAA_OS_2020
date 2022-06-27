@@ -13,7 +13,7 @@
 #define ENVX(envid)	((envid) & (NENV - 1))
 #define GET_ENV_ASID(envid) (((envid)>> 11)<<6)
 
-#define THREAD_MAX 8// the max num of thread in the same env
+#define THREAD_MAX 16// the max num of thread in the same env
 
 //the cancel state of thread
 #define THREAD_CAN_BE_CANCELED       1
@@ -66,7 +66,7 @@ struct Tcb {
 	int tcb_canceltype;
 	u_int tcb_canceled;
 
-	u_int tcb_nop[12]; //align to avoid mul instruction
+	//u_int tcb_nop[12]; //align to avoid mul instruction
 };
 
 struct Env {
@@ -96,9 +96,9 @@ struct Env {
 	u_int env_runs;			// number of times been env_run'ed
 	u_int env_thread_count;
 	//struct Tcb env_threads[8];
-	u_int env_nop[494];                  // align to avoid mul instruction
+	u_int env_nop[174];                  // align to avoid mul instruction
 
-	struct Tcb env_threads[8];
+	struct Tcb env_threads[16];
 };
 
 LIST_HEAD(Env_list, Env);

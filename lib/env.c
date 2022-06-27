@@ -74,10 +74,9 @@ u_int mkenvid(struct Env *e) {
     return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
 }
 
-u_int mktcbid(struct Tcb *t) { 
+u_int mktcbid(struct Tcb *t, u_int tcb_no) { 
 
 	struct Env *e = ROUNDDOWN(t,BY2PG);
-	u_int tcb_no = ((u_int)t - (u_int)e - BY2PG/2)/(BY2PG/16);
 	return ((e->env_id << 3) | tcb_no); 
 }
 
@@ -238,7 +237,7 @@ int thread_alloc(struct Env *e, struct Tcb **new) {
 	}
 	++(e->env_thread_count);
 	struct Tcb *t = &e->env_threads[thread_no];
-	t->thread_id = mktcbid(t);
+	t->thread_id = mktcbid(t, thread_no);
 	printf("thread id is 2'b%b\n",t->thread_id);
 	t->tcb_status = ENV_RUNNABLE;
 	t->tcb_tf.cp0_status = 0x10001004;
