@@ -21,14 +21,14 @@ int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void * (*start
 
 void pthread_exit(void *value_ptr) {
 	u_int threadid = syscall_getthreadid();
-	struct Tcb *t = &env->env_threads[threadid&0x7];
+	struct Tcb *t = &env->env_threads[threadid & 0xf];
 	t->tcb_exit_ptr = value_ptr;
 	syscall_thread_destroy(threadid);
 }
 
 int pthread_setcancelstate(int state, int *oldvalue) {
 	u_int threadid = syscall_getthreadid();
-	struct Tcb *t = &env->env_threads[threadid&0x7];
+	struct Tcb *t = &env->env_threads[threadid & 0xf];
 	if ((state != THREAD_CAN_BE_CANCELED) & (state != THREAD_CANNOT_BE_CANCELED)) {
 		return -1;
 	}
@@ -44,7 +44,7 @@ int pthread_setcancelstate(int state, int *oldvalue) {
 
 int pthread_setcanceltype(int type, int *oldvalue) {
 	u_int threadid = syscall_getthreadid();
-	struct Tcb *t = &env->env_threads[threadid&0x7];
+	struct Tcb *t = &env->env_threads[threadid & 0xf];
 	if ((type != THREAD_CANCEL_IMI) & (type != THREAD_CANCEL_POINT)) {
 		return -1;
 	}
@@ -60,7 +60,7 @@ int pthread_setcanceltype(int type, int *oldvalue) {
 
 void pthread_testcancel() {
 	u_int threadid = syscall_getthreadid();
-	struct Tcb *t = &env->env_threads[threadid&0x7];
+	struct Tcb *t = &env->env_threads[threadid & 0xf];
 	if (t->thread_id != threadid) {
 		user_panic("panic at pthread_testcancel!\n");
 	}
@@ -72,7 +72,7 @@ void pthread_testcancel() {
 }
 
 int pthread_cancel(pthread_t thread) {
-	struct Tcb *t = &env->env_threads[thread&0x7];
+	struct Tcb *t = &env->env_threads[thread & 0xf];
 	if ((t->thread_id != thread)|(t->tcb_status == ENV_FREE)) {
 		return -E_THREAD_NOTFOUND;
 	}
@@ -90,14 +90,14 @@ int pthread_cancel(pthread_t thread) {
 }
 
 int pthread_detach(pthread_t thread) {
-	struct Tcb *t = &env->env_threads[thread&0x7];
+	struct Tcb *t = &env->env_threads[thread & 0xf];
 	int r;
 	int i;
 	if (t->thread_id != thread) {
 		return -E_THREAD_NOTFOUND;
 	}
 	if (t->tcb_status == ENV_FREE) {
-		u_int sp = USTACKTOP - BY2PG*4*(thread&0x7);
+		u_int sp = USTACKTOP - BY2PG*4*(thread & 0xf);
 		for(i = 1; i <= 4; ++i) {
 			r = syscall_mem_unmap(0,sp-i*BY2PG);
 			if (r < 0)

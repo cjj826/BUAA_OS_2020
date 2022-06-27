@@ -77,7 +77,7 @@ u_int mkenvid(struct Env *e) {
 u_int mktcbid(struct Tcb *t, u_int tcb_no) { 
 
 	struct Env *e = ROUNDDOWN(t,BY2PG);
-	return ((e->env_id << 3) | tcb_no); 
+	return ((e->env_id << 4) | tcb_no); 
 }
 
 /* Overview:
@@ -138,9 +138,9 @@ int threadid2tcb(u_int threadid, struct Tcb **ptcb) {
 		return 0;
 	}
 	//printf("threadid is %b\n", threadid);
-	e = &envs[ENVX(threadid >> 3)];
+	e = &envs[ENVX(threadid >> 4)];
 	//printf("env_id is %b, env_thread_count is %d\n", e->env_id, e->env_thread_count);
-	t = &e->env_threads[threadid & 0x7];
+	t = &e->env_threads[threadid & 0xf];
 	//printf("t->threadid is %b\n", t->thread_id);
 	if (t->tcb_status == ENV_FREE || t->thread_id != threadid) {
 		*ptcb = 0;
@@ -242,7 +242,7 @@ int thread_alloc(struct Env *e, struct Tcb **new) {
 	t->tcb_status = ENV_RUNNABLE;
 	t->tcb_tf.cp0_status = 0x10001004;
 	t->tcb_exit_ptr = (void *)0;
-	t->tcb_tf.regs[29] = USTACKTOP - 4*BY2PG*(t->thread_id & 0x7);
+	t->tcb_tf.regs[29] = USTACKTOP - 4*BY2PG*(t->thread_id & 0xf);
 	t->tcb_cancelstate = THREAD_CANNOT_BE_CANCELED;
 	t->tcb_canceltype = THREAD_CANCEL_IMI;
 	t->tcb_canceled = 0;

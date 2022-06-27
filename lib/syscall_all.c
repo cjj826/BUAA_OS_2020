@@ -347,7 +347,7 @@ int sys_thread_alloc(void)
 	//t->tcb_tf.regs[29] = son_sp + sp_offset;
 	t->tcb_tf.regs[2] = 0;
 	t->tcb_tf.pc = t->tcb_tf.cp0_epc;
-	return t->thread_id & 0x7;
+	return t->thread_id & 0xf;
 
 }
 
@@ -493,7 +493,7 @@ void sys_ipc_recv(int sysno, u_int dstva)
         return;
     }
     curenv->env_ipc_recving = 1;
-    curenv->env_ipc_waiting_thread_no = curtcb->thread_id & 0x7;
+    curenv->env_ipc_waiting_thread_no = curtcb->thread_id & 0xf;
     curenv->env_ipc_dstva = dstva;
     curtcb->tcb_status = ENV_NOT_RUNNABLE;
     sys_yield();
