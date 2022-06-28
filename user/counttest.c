@@ -53,9 +53,9 @@ void even_t() {
 
 int produce() {
     static int x = 0;
-    writef("produce num %d\n", x);
 	x = (x + 1) % 10;
-    return x;
+    writef("produce num %d\n", x);
+	return x;
 }
 
 void put(int x) {

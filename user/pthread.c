@@ -13,7 +13,7 @@ int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void * (*start
 	t->tcb_tf.pc = start_rountine;
 	t->tcb_tf.regs[29] -= 4;
 	t->tcb_tf.regs[4] = arg; //
-	t->tcb_tf.regs[31] = exit;
+	t->tcb_tf.regs[31] = exit_son;
 	syscall_set_thread_status(t->thread_id, ENV_RUNNABLE);	
 	*thread = t->thread_id;
 	return 0;
@@ -114,3 +114,4 @@ int pthread_join(pthread_t thread, void **value_ptr) {
 	int r = syscall_thread_join(thread,value_ptr);
 	return r;
 }
+

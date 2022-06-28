@@ -2,15 +2,23 @@
 #include <mmu.h>
 #include <env.h>
 
+void exit_son(void){
+	u_int thread_id = syscall_getthreadid();
+
+    struct Tcb *t = &env->env_threads[thread_id & 0xf];
+
+    t->tcb_exit_value = -1;//exit
+    t->tcb_exit_ptr = &(t->tcb_exit_value);
+
+    syscall_thread_destroy(thread_id);
+}
+
 void
 exit(void)
 {
 	//close_all();
-	//syscall_env_destroy(0);
-	struct Tcb *t = &env->env_threads[syscall_getthreadid() & 0xf];
-	t->tcb_exit_value = -1;//exit
-	t->tcb_exit_ptr = &(t->tcb_exit_value);
-	syscall_thread_destroy(0);
+	syscall_env_destroy(0);
+	
 }
 
 

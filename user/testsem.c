@@ -50,4 +50,7 @@ void umain() {
 	pthread_create(&thread2,NULL,buy,(void *)arg2);
 	arg3[2] = 3;
 	pthread_create(&thread3,NULL,buy,(void *)arg3);
+	pthread_join(thread1, NULL);
+	pthread_join(thread2, NULL);
+	pthread_join(thread3, NULL);
 }

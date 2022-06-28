@@ -67,8 +67,16 @@ void sched_yield(void)
             	}
         	}
        		 while(1){
-            	while(LIST_EMPTY(&tcb_sched_list[point]))
-                	point = 1 - point;
+				int flag = 0;
+            	while(LIST_EMPTY(&tcb_sched_list[point])) {
+					//printf("being sched\n");
+					if (flag == 1) {
+						//printf("no thread\n");
+						panic("no thread can be run!!!");
+					}
+					point = 1 - point;
+					flag = 1;
+				}
             	t = LIST_FIRST(&tcb_sched_list[point]);
             	if(t->tcb_status == ENV_FREE){
                 	LIST_REMOVE(t, tcb_sched_link);

@@ -32,61 +32,58 @@
 #define ENV_NOT_RUNNABLE	2
 
 struct sem {
-	u_int sem_envid; //the env where the sem is in
-   	u_int sem_head; //the queue's head
-    u_int sem_tail; //the queue's tail
-	char sem_name[16]; //name of the sem
-	int sem_value; // value of the sem
-	int sem_shared; // 0 shows the sem is onlu used in the sem_envid
-	int sem_wait_count; //the num of the process that is blocked 
-	struct Tcb *sem_wait_queue[10]; //the queue
+	u_int sem_envid;            //the env where the sem is in
+   	u_int sem_head;             //the queue's head
+    u_int sem_tail;             //the queue's tail
+	char sem_name[16];          //name of the sem
+	int sem_value;              // value of the sem
+	int sem_shared;             // 0 shows the sem is onlu used in the sem_envid
+	int sem_wait_count;         //the num of the process that is blocked 
+	struct Tcb *sem_wait_queue[10];  //the queue
 };
 
 
 struct Tcb {
 	//basic information
-	struct Trapframe tcb_tf; //the tf of thread 
-	u_int thread_id; //the id of thread
-	u_int tcb_status; //the status of thread
-    u_int tcb_pri; //the pri of thread 
+	struct Trapframe tcb_tf;            //the tf of thread 
+	u_int thread_id;                    //the id of thread
+	u_int tcb_status;                   //the status of thread
+    u_int tcb_pri;                      //the pri of thread 
 
 	//sched information
-	LIST_ENTRY(Tcb) tcb_sched_link; //the same as env_sched_link
+	LIST_ENTRY(Tcb) tcb_sched_link;     //the same as env_sched_link
    
-	struct Tcb *tcb_joined; //only one thread can join, otherwise will be undefined
-    void **tcb_join_value_ptr; 
-	u_int tcb_detach;
+	struct Tcb *tcb_joined;             //only one thread can join, otherwise will be undefined
+    void **tcb_join_value_ptr;          //point to the join value
+	u_int tcb_detach;                   //is the thread detached ?
 
 	//exit information
-	void *tcb_exit_ptr;
-    int tcb_exit_value;
+	void *tcb_exit_ptr;                 //point to the exit value
+    int tcb_exit_value;                 //the exit value
 
 	//cancel information
-	int tcb_cancelstate;
-	int tcb_canceltype;
-	u_int tcb_canceled;
+	int tcb_cancelstate;                //cancel state
+	int tcb_canceltype;                 //cancel type
+	u_int tcb_canceled;                 //is the thread canceled ?
 
-	//u_int tcb_nop[12]; //align to avoid mul instruction
 };
 
 struct Env {
-	//struct Trapframe env_tf;        // Saved registers
 	LIST_ENTRY(Env) env_link;       // Free list
 	u_int env_id;                   // Unique environment identifier
 	u_int env_parent_id;            // env_id of this env's parent
-	//u_int env_status;               // Status of the environment
 	Pde  *env_pgdir;                // Kernel virtual address of page dir
 	u_int env_cr3;
 	LIST_ENTRY(Env) env_sched_link;
-        //u_int env_pri;
+	
 	// Lab 4 IPC
 	u_int env_ipc_value;            // data value sent to us 
 	u_int env_ipc_from;             // envid of the sender  
 	u_int env_ipc_recving;          // env is blocked receiving
-	u_int env_ipc_dstva;		// va at which to map received page
-	u_int env_ipc_perm;		// perm of page mapping received
+	u_int env_ipc_dstva;		    // va at which to map received page
+	u_int env_ipc_perm;		        // perm of page mapping received
 
-	u_int env_ipc_waiting_thread_no;//
+	u_int env_ipc_waiting_thread_no;// the waiting thread_no
 	
 	// Lab 4 fault handling
 	u_int env_pgfault_handler;      // page fault state
@@ -95,9 +92,9 @@ struct Env {
 	// Lab 6 scheduler counts
 	u_int env_runs;			// number of times been env_run'ed
 	u_int env_thread_count;
-	//struct Tcb env_threads[8];
 	u_int env_nop[174];                  // align to avoid mul instruction
 
+	// lab4 challenge
 	struct Tcb env_threads[16];
 };
 

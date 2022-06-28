@@ -15,14 +15,14 @@ void *test(void *arg) {
 	writef("a is %d\n",a);
 	++b;
 	writef("b is change\n");
-	while (1) {
+	/*while (1) {
 		//writef("a is still %d\n",a);
 		writef("");
 		//c = a;
 		if (a != 1)
 			break;
 		continue;
-	}
+	}*/
 	writef("a is %d\n",a);
 }
 
@@ -55,7 +55,5 @@ void umain() {
 		writef("I am out\n");	
 	}
 	writef("end\n");
-	for (;;) {
-		
-	}
+	pthread_exit(0);
 }

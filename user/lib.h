@@ -11,6 +11,7 @@
 extern void umain();
 extern void libmain();
 extern void exit();
+extern void exit_son();
 
 extern struct Env *env;
 extern struct Tcb *tcb;

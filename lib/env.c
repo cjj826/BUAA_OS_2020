@@ -508,6 +508,17 @@ env_free(struct Env *e)
     /* Hint: free the ASID */
     asid_free(e->env_id >> (1 + LOG2NENV));
     page_decref(pa2page(pa));
+
+	//free all thread
+	u_int i;
+	for (i = 0; i < THREAD_MAX; i++) {
+		struct Tcb* t = &e->env_threads[i];
+		if (t->tcb_status != ENV_FREE) {
+			t->tcb_status = ENV_FREE;
+			printf("I'm thread no %d, I'm killed...\n", i);
+		}
+	}
+
     /* Hint: return the environment to the free list. */
    // e->env_status = ENV_FREE;
     LIST_INSERT_HEAD(&env_free_list, e, env_link);
