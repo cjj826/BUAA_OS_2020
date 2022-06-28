@@ -570,7 +570,8 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
     e->env_ipc_from = curenv->env_id;
     t = &e->env_threads[e->env_ipc_waiting_thread_no];
     e->env_ipc_value = value;
-    t->tcb_status = ENV_RUNNABLE;
+    //t->tcb_status = ENV_RUNNABLE;
+	sys_set_thread_status(0, t->thread_id, ENV_RUNNABLE);
 	e->env_ipc_perm = perm;
    	if (srcva) {
 		p = page_lookup(curenv->env_pgdir, srcva, NULL);
