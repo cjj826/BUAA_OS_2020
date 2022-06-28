@@ -7,10 +7,10 @@
 #ifndef NULL
 #define NULL ((void *) 0)
 #endif /* !NULL */
-typedef unsigned int 	pthread_t;
-typedef unsigned int	pthread_attr_t;
+typedef unsigned int 	pthread_t; // thread id
+typedef unsigned int	pthread_attr_t; // thread attr
 
-typedef struct sem      sem_t;
+typedef struct sem      sem_t; //sem struct
 
 typedef unsigned char            u_int8_t;
 typedef short                     int16_t;

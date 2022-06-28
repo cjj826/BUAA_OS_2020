@@ -15,7 +15,7 @@ struct Tcb *curtcb = NULL;
 
 static struct Env_list env_free_list;    // Free list
 struct Env_list env_sched_list[2];      // Runnable list
-struct Tcb_list tcb_sched_list[2];
+struct Tcb_list tcb_sched_list[2];      // Runnable thread list     
 
 extern Pde *boot_pgdir;
 extern char *KERNEL_SP;
@@ -74,8 +74,8 @@ u_int mkenvid(struct Env *e) {
     return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
 }
 
+// make a unique ID for every thread
 u_int mktcbid(struct Tcb *t, u_int tcb_no) { 
-
 	struct Env *e = ROUNDDOWN(t,BY2PG);
 	return ((e->env_id << 4) | tcb_no); 
 }
@@ -129,6 +129,7 @@ int envid2env(u_int envid, struct Env **penv, int checkperm)
     return 0;
 }
 
+//Convert an threadid to a tcb pointer.
 int threadid2tcb(u_int threadid, struct Tcb **ptcb) {
 	struct Tcb *t;
 	struct Env *e;
@@ -223,34 +224,42 @@ env_setup_vm(struct Env *e)
     return 0;
 }
 
+
+//Allocate and Initialize a new thread.
 int thread_alloc(struct Env *e, struct Tcb **new) {
+	//step 1 get the tcb
 	if (e->env_thread_count >= THREAD_MAX)
-		return E_THREAD_MAX;
-	u_int thread_no = e->env_thread_count;
+		return -E_THREAD_MAX;
+
+	u_int thread_no;
 	u_int i = 0;
-	while (e->env_threads[thread_no].tcb_status != ENV_FREE) {
-		++thread_no;
-		thread_no = thread_no % THREAD_MAX;
-		++i;
-		if (i >= THREAD_MAX)
-			return E_THREAD_MAX;
+
+	for (i = 0; i < THREAD_MAX; i++) {
+		if (e->env_threads[i].tcb_status == ENV_FREE) {
+			thread_no = i;
+			break;
+		}
 	}
+
+	if (i == THREAD_MAX) {
+		return -E_THREAD_MAX;
+	}
+
 	++(e->env_thread_count);
 	struct Tcb *t = &e->env_threads[thread_no];
 	t->thread_id = mktcbid(t, thread_no);
-	printf("thread id is 2'b%b\n",t->thread_id);
+	//printf("thread id is 0x%x\n",t->thread_id);
+	//setp 2 init
+
 	t->tcb_status = ENV_RUNNABLE;
-	t->tcb_tf.cp0_status = 0x10001004;
+	t->tcb_tf.cp0_status = 0x1000100c;
 	t->tcb_exit_ptr = (void *)0;
-	t->tcb_tf.regs[29] = USTACKTOP - 4*BY2PG*(t->thread_id & 0xf);
+	t->tcb_tf.regs[29] = USTACKTOP - 4 * BY2PG * (t->thread_id & 0xf);
 	t->tcb_cancelstate = THREAD_CANNOT_BE_CANCELED;
 	t->tcb_canceltype = THREAD_CANCEL_IMI;
 	t->tcb_canceled = 0;
-
     t->tcb_exit_value = 0;
-	//t->tcb_exit_ptr = (void *)&t->tcb_exit_value;
 	t->tcb_detach = 0;
-	//LIST_INIT(&t->tcb_joined_list);
     t->tcb_joined = NULL;
 
 	*new = t;
@@ -302,7 +311,7 @@ env_alloc(struct Env **new, u_int parent_id)
 
 	e->env_id = mkenvid(e);
     //e->env_status = ENV_RUNNABLE;
-    if ((r = thread_alloc(e,&t)) < 0) {
+    if ((r = thread_alloc(e, &t)) < 0) {
 		return r;
 	}
 	t->tcb_status = ENV_RUNNABLE;

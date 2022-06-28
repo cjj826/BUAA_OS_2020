@@ -21,10 +21,9 @@
 
 //the cancel type of thread
 #define THREAD_CANCEL_IMI            0
-#define THREAD_CANCEL_POINT          1 //wait for next cancel point
+#define THREAD_CANCEL_POINT          1 // wait for next cancel point
 
-#define THREAD_CANCELED_EXIT        24 //
-#define E_THREAD_JOIN_FAIL          25 
+#define THREAD_CANCELED_EXIT        24 // the exit value when cancel
 
 // Values of env_status in struct Env
 #define ENV_FREE	0
@@ -37,7 +36,7 @@ struct sem {
     u_int sem_tail;             //the queue's tail
 	char sem_name[16];          //name of the sem
 	int sem_value;              // value of the sem
-	int sem_shared;             // 0 shows the sem is onlu used in the sem_envid
+	int sem_shared;             // 0 shows the sem is only used in the sem_envid
 	int sem_wait_count;         //the num of the process that is blocked 
 	struct Tcb *sem_wait_queue[10];  //the queue
 };
@@ -103,9 +102,9 @@ LIST_HEAD(Tcb_list, Tcb);
 
 extern struct Env *envs;		// All environments
 extern struct Env *curenv;	        // the current env
-extern struct Tcb *curtcb;
+extern struct Tcb *curtcb;      // the current thread  
 extern struct Env_list env_sched_list[2]; // runnable env list
-extern struct Tcb_list tcb_sched_list[2];
+extern struct Tcb_list tcb_sched_list[2];//  runnable thread list
 
 void env_init(void);
 int env_alloc(struct Env **e, u_int parent_id);
@@ -119,7 +118,7 @@ void env_destroy(struct Env *e);
 int envid2env(u_int envid, struct Env **penv, int checkperm);
 int threadid2tcb(u_int threadid, struct Tcb **ptcb);
 
-void env_run(struct Tcb *t); //the smallest unit of scheduling is thread
+void env_run(struct Tcb *t); //now, the smallest unit of scheduling is thread
 
 
 // for the grading script

@@ -19,8 +19,8 @@ void mips_init() {
 	env_init();
 
 //	ENV_CREATE(user_tltest);
-	 //ENV_CREATE(user_fktest);
-	ENV_CREATE(user_pingpong);
+	ENV_CREATE(user_fktest);
+	//ENV_CREATE(user_pingpong);
 	//ENV_CREATE(user_pttest);
 	//ENV_CREATE(user_ptexittest);
 	//ENV_CREATE(user_ptcanceltest);

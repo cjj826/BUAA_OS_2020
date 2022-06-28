@@ -20,13 +20,16 @@
 #define E_BAD_PATH	10	// Bad path
 #define E_FILE_EXISTS	11	// File already exists
 #define E_NOT_EXEC	12	// File not a valid executable
-#define E_THREAD_MAX	13
-#define E_THREAD_NOTFOUND 14 
-#define E_THREAD_CANNOTCANCEL 15
-#define E_SEM_ERROR	16
-#define E_SEM_NOTFOUND	17
-#define E_SEM_EAGAIN	18
 
-#define MAXERROR 18
+#define E_THREAD_MAX	13 // too many thread in the same process
+#define E_THREAD_NOTFOUND 14  // can find the target thread in the process
+#define E_THREAD_CANNOTCANCEL 15 // thread can't be canceled
+#define E_THREAD_JOIN_FAIL 16 // fail when try to join a detached thread
+
+#define E_SEM_ERROR	17 // something wrong with the sem
+#define E_SEM_NOTFOUND	18 // can't find the sem
+#define E_SEM_EAGAIN	19 // wrong in the trywait 
+
+#define MAXERROR 19
 
 #endif // _ERROR_H_
