@@ -99,8 +99,11 @@ int pthread_cancel(pthread_t thread) {
 
 	t->tcb_exit_value = -THREAD_CANCELED_EXIT;
 	t->tcb_exit_ptr = &(t->tcb_exit_value);
+
+	writef("now the exit value is %d\n", *((int *)t->tcb_exit_ptr));
 	// cancel immediately
 	if (t->tcb_canceltype == THREAD_CANCEL_IMI) {
+		writef("now excute this\n");
 		syscall_thread_destroy(thread);
 	} else {
 		t->tcb_canceled = 1;

@@ -563,8 +563,20 @@ int sys_thread_join(int sysno, u_int threadid, void **value_ptr)
 {
 	struct Tcb *t;
 	int r;
-	if ((r = threadid2tcb(threadid, &t)) < 0) {
+	if ((r = threadid2tcb(threadid, &t)) == -E_THREAD_NOTFOUND) {
+		printf("something wrong!\n");
 		return r;
+	} else if (r == -2) {
+		//tcb_status is free
+		printf("join a free tcb\n");
+		printf("the point is %x\n", t->tcb_exit_ptr);
+        if (value_ptr != 0) {
+
+            printf("tt the value is %d", *(int *)t->tcb_exit_ptr);
+			*value_ptr = (void *)t->tcb_exit_ptr;
+        }
+		printf("the value is %d\n", **((int**) value_ptr));
+        return 0;
 	}
 
 	//printf("tcb_detach is %d\n", t->tcb_detach);
@@ -573,13 +585,6 @@ int sys_thread_join(int sysno, u_int threadid, void **value_ptr)
 		return -E_THREAD_JOIN_FAIL;
 	}
 	
-	//stop join immediately when the target thread exits.
-	if (t->tcb_status == ENV_FREE) {
-		if (value_ptr != 0) {
-			*value_ptr = t->tcb_exit_ptr;
-		}
-		return 0;
-	}
 
 	printf("ready to in join!\n");
     

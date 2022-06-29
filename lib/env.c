@@ -143,9 +143,12 @@ int threadid2tcb(u_int threadid, struct Tcb **ptcb) {
 	//printf("env_id is %b, env_thread_count is %d\n", e->env_id, e->env_thread_count);
 	t = &e->env_threads[threadid & 0xf];
 	//printf("t->threadid is %b\n", t->thread_id);
-	if (t->tcb_status == ENV_FREE || t->thread_id != threadid) {
-		*ptcb = 0;
+	if (t->tcb_status == ENV_FREE) {
+		*ptcb = t;
 		return -E_BAD_ENV;
+	} else if (t->thread_id != threadid) {
+		*ptcb = 0;
+		return -E_THREAD_NOTFOUND;
 	}
     *ptcb = t;
 	return 0;

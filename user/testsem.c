@@ -51,8 +51,8 @@ void umain() {
 	pthread_create(&thread2,NULL,buy,(void *)arg2);
 	arg3[2] = 3;
 	pthread_create(&thread3,NULL,buy,(void *)arg3);
-	//pthread_exit(NULL);
-	int r;
+	pthread_exit(NULL);
+	/*int r;
 	void **value = NULL; 
 	writef("wait 1\n");
 	r = pthread_join(thread1, value);
@@ -68,5 +68,5 @@ void umain() {
 	r = pthread_join(thread3, value);
 	if (r < 0) {
 		writef("wrong behavior3\n"); 
-	}
+	}*/
 }
