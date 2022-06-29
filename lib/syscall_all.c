@@ -568,14 +568,9 @@ int sys_thread_join(int sysno, u_int threadid, void **value_ptr)
 		return r;
 	} else if (r == -2) {
 		//tcb_status is free
-		printf("join a free tcb\n");
-		printf("the point is %x\n", t->tcb_exit_ptr);
         if (value_ptr != 0) {
-
-            printf("tt the value is %d", *(int *)t->tcb_exit_ptr);
 			*value_ptr = (void *)t->tcb_exit_ptr;
         }
-		printf("the value is %d\n", **((int**) value_ptr));
         return 0;
 	}
 
