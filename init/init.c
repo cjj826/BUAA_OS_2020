@@ -35,8 +35,8 @@ void mips_init() {
 	//ENV_CREATE(user_teste);
 	
 	//ENV_CREATE(user_mytestcreate);
-	//ENV_CREATE(user_mytestexit);
-	ENV_CREATE(user_mytestcancel);
+	ENV_CREATE(user_mytestexit);
+	//ENV_CREATE(user_mytestcancel);
 	trap_init();
 	kclock_init();
 

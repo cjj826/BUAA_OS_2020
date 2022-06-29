@@ -121,11 +121,14 @@ int sys_thread_destroy(int sysno, u_int threadid)
     if (t->tcb_status == ENV_FREE) {
 		return -E_INVAL;
 	}
-	
+
+	printf("des tttt!!!\n");
 	// run the thread that is joined with now thread
     if (t->tcb_joined != NULL) {
+		printf("wwake !!!\n");
 		struct Tcb *tmp = t->tcb_joined;
 		t->tcb_joined = NULL;
+		printf("ptr is %x\n", tmp->tcb_join_value_ptr);
 		if (tmp->tcb_join_value_ptr) {
 			*(tmp->tcb_join_value_ptr) = t->tcb_exit_ptr;	
 		}

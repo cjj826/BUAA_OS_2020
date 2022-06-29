@@ -1,14 +1,19 @@
 #include "lib.h"
 
 void *test1(void *arg) {
-	int ret = -24;
+	int ret = 240;
 	pthread_exit(&ret);
 }
+int r = 200;
 
 void *test2(void *arg) {
     writef("I can make it through the rain!\n");
     writef("thread2 is end!\n");
-    return;
+	//int r = 200;
+	int *point = &r;
+	writef("the point %x\n", point);
+	writef("the point is %d\n", *point);
+	return (void *) point;
 }
 
 void *test3(void *arg) {
@@ -37,9 +42,14 @@ void umain() {
     pthread_create(&thread3, NULL, test3, (void *)args);
     
 	int ret2 = 0;
-	int *pret2 = &ret2;
+	int* pret2 = &ret2;
+	
+	writef("the pret2 is %x\n", &pret2);
 
 	pthread_join(thread2, &pret2);
+	
+	 writef("the thread2's ret2 is %d\n", *pret2);
+
 
     return;
 }

@@ -24,7 +24,7 @@ all: tltest.x tltest.b \
 	semtest.x semtest.b teste.x teste.b counttest.x counttest.b detachtest.x detachtest.b exitjoin.x exitjoin.b pttest2.x pttest2.b \
 	testsem.x testsem.b cjjtest.x cjjtest.b ptjointest.x ptjointest.b ptcanceltest.x ptcanceltest.b pttest.x pttest.b ptexittest.x ptexittest.b \
 	fktest.x fktest.b pingpong.x pingpong.b idle.x \
-	$(USERLIB) entry.o syscall_wrap.o
+	$(USERLIB) entry.o syscall_wrap.o re_exit.o
 
 %.x: %.b.c
 	echo cc1 $<
@@ -37,7 +37,7 @@ all: tltest.x tltest.b \
 	./bintoc $* $< > $@~ && mv -f $@~ $@
 #	grep \. $@
 
-%.b: entry.o syscall_wrap.o %.o $(USERLIB)
+%.b: entry.o syscall_wrap.o re_exit.o %.o $(USERLIB)
 	echo ld $@
 	$(LD) -o $@ $(LDFLAGS) -G 0 -static -n -nostdlib -T ./user.lds $^
 
