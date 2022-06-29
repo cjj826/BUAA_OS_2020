@@ -531,7 +531,7 @@ env_free(struct Env *e)
     /* Hint: return the environment to the free list. */
    // e->env_status = ENV_FREE;
     LIST_INSERT_HEAD(&env_free_list, e, env_link);
-    LIST_REMOVE(e, env_sched_link);
+    //LIST_REMOVE(e, env_sched_link);
 }
 
 void thread_free(struct Tcb *t)

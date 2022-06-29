@@ -1,7 +1,7 @@
 #include "lib.h"
 #include <error.h>
 
-int sem_init(sem_t *sem,int shared,unsigned int value) {
+int sem_init(sem_t *sem, int shared, unsigned int value) {
 	if (sem == 0) {
 		return -E_SEM_ERROR;
 	}

@@ -2,6 +2,7 @@
 #include <mmu.h>
 #include <env.h>
 
+// the special exit for the son thread
 void exit_son(void){
 	u_int thread_id = syscall_getthreadid();
 
@@ -13,6 +14,7 @@ void exit_son(void){
     syscall_thread_destroy(thread_id);
 }
 
+// the normal exit
 void
 exit(void)
 {

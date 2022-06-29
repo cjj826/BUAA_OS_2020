@@ -23,7 +23,7 @@ umain(void)
 
 		//user_panic("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 		if (i == 10) {
-			return;
+			return ;
 		}
 
 		i++;
@@ -31,9 +31,8 @@ umain(void)
 		ipc_send(who, i, 0, 0);
 
 		if (i == 10) {
-			return;
+			return ;
 		}
 	}
-
 }
 

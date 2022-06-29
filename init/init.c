@@ -18,8 +18,8 @@ void mips_init() {
 
 	env_init();
 
-//	ENV_CREATE(user_tltest);
-	ENV_CREATE(user_fktest);
+	//ENV_CREATE(user_tltest);
+	//ENV_CREATE(user_fktest);
 	//ENV_CREATE(user_pingpong);
 	//ENV_CREATE(user_pttest);
 	//ENV_CREATE(user_ptexittest);
@@ -27,6 +27,7 @@ void mips_init() {
 	//ENV_CREATE(user_ptjointest);
 	//NV_CREATE(user_cjjtest);
 	//ENV_CREATE(user_testsem);
+	ENV_CREATE(user_semtest);
 	//ENV_CREATE(user_pttest2);
 	//ENV_CREATE(user_exitjoin);
 	//ENV_CREATE(user_detachtest);

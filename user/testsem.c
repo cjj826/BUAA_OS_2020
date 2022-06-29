@@ -21,6 +21,7 @@ void *buy(void *args) {
 		}
 		writef("son%d free mutex\n",son);
 		sem_post(mutex);
+		//writef("here\n");
 		if (exitflag) {
 			break;
 		}
@@ -50,7 +51,22 @@ void umain() {
 	pthread_create(&thread2,NULL,buy,(void *)arg2);
 	arg3[2] = 3;
 	pthread_create(&thread3,NULL,buy,(void *)arg3);
-	pthread_join(thread1, NULL);
-	pthread_join(thread2, NULL);
-	pthread_join(thread3, NULL);
+	//pthread_exit(NULL);
+	int r;
+	void **value = NULL; 
+	writef("wait 1\n");
+	r = pthread_join(thread1, value);
+	if (r < 0) {
+		writef("wrong behavior1\n");	
+	}
+	writef("wait 2\n");
+	r = pthread_join(thread2, value);
+	if (r < 0) {
+		writef("wrong behavior2\n"); 
+	}
+	writef("wait 3\n");
+	r = pthread_join(thread3, value);
+	if (r < 0) {
+		writef("wrong behavior3\n"); 
+	}
 }

@@ -56,6 +56,8 @@ u_int sys_getenvid(void)
 	return curenv->env_id;
 }
 
+//This function provides the environment id of current thread.
+
 u_int sys_getthreadid(void)
 {
 	return curtcb->thread_id;
@@ -106,6 +108,8 @@ int sys_env_destroy(int sysno, u_int envid)
 	return 0;
 }
 
+
+//This function is used to destroy a thread.
 int sys_thread_destroy(int sysno, u_int threadid)
 {
 	int r;
@@ -118,17 +122,17 @@ int sys_thread_destroy(int sysno, u_int threadid)
 		return -E_INVAL;
 	}
 	
-	//printf("pointer is %x", t->tcb_exit_ptr);
-	//printf("going to des\n");
-	//t->tcb_exit_value = 0;
-	struct Tcb *tmp = t->tcb_joined;
+	// run the thread that is joined with now thread
     if (t->tcb_joined != NULL) {
+		struct Tcb *tmp = t->tcb_joined;
 		t->tcb_joined = NULL;
-		*(tmp->tcb_join_value_ptr) = t->tcb_exit_ptr;
+		if (tmp->tcb_join_value_ptr) {
+			*(tmp->tcb_join_value_ptr) = t->tcb_exit_ptr;	
+		}
 		sys_set_thread_status(0, tmp->thread_id, ENV_RUNNABLE);
 	}
 
-	printf("[%08x] destroying tcb %b\n", curenv->env_id, t->thread_id);
+	printf("[%08x] destroying tcb %08x\n", curenv->env_id, t->thread_id);
 	thread_destroy(t);
 	return 0;
 }
@@ -324,31 +328,22 @@ int sys_env_alloc(void)
 	//	panic("sys_env_alloc not implemented");
 }
 
+//Allocate a new environment
 int sys_thread_alloc(void)
 {
 	int r;
 	struct Tcb *t;
 
-	if (curenv)
-		r = thread_alloc(curenv, &t);
-	else
-		r = -1;
-	if (r < 0)
+	if ((r = thread_alloc(curenv, &t)) < 0) {
 		return r;
-	if (curenv)
-		t->tcb_pri = curenv->env_threads[0].tcb_pri;
-	else
-		t->tcb_pri = 1;
+	}
+
+	t->tcb_pri = curenv->env_threads[0].tcb_pri;
 	t->tcb_status = ENV_NOT_RUNNABLE;
-	//u_int father_sp = USTACKTOP - 4*BY2PG*(curtcb->thread_id&0x7);
-	//u_int son_sp = USTACKTOP - 4*BY2PG*(t->thread_id&0x7);
-	//bcopy(KERNEL_SP-sizeof(struct Trapframe),&(t->tcb_tf),sizeof(struct Trapframe));
-	//u_int sp_offset = t->tcb_tf.regs[29] - father_sp;
-	//t->tcb_tf.regs[29] = son_sp + sp_offset;
 	t->tcb_tf.regs[2] = 0;
 	t->tcb_tf.pc = t->tcb_tf.cp0_epc;
-	return t->thread_id & 0xf;
-
+	
+	return t->thread_id & 0xf; // return the number of thread in the process
 }
 
 /* Overview:
@@ -363,25 +358,6 @@ int sys_thread_alloc(void)
  * 	Return -E_INVAL if status is not a valid status for an environment.
  * 	The status of environment will be set to `status` on success.
  */
-/*** exercise 4.14 ***/
-/*int sys_set_env_status(int sysno, u_int envid, u_int status)
-{
-	// Your code here.
-	struct Env *env;
-	int ret;
-	if((ret = envid2env(envid, &env, 0))) {
-        return ret;
-    }
-    if (status > 2 || status < 0) {
-        return -E_INVAL;
-    }
-    env->env_status = status;
-    if (env->env_status == ENV_RUNNABLE) {
-        LIST_INSERT_HEAD(env_sched_list, env, env_sched_link);
-    }
-	return 0;
-	//	panic("sys_env_set_status not implemented");
-}*/
 int sys_set_env_status(int sysno, u_int envid, u_int status)
 {
 	// Your code here.
@@ -394,15 +370,18 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
     if (status > 2 || status < 0) {
         return -E_INVAL;
     }
+
     tcb = &env->env_threads[0];
     env->env_threads[0].tcb_status = status;
+
     if (env->env_threads[0].tcb_status == ENV_RUNNABLE) {
 		LIST_INSERT_HEAD(tcb_sched_list, tcb, tcb_sched_link);
     }
+
 	return 0;
-	//	panic("sys_env_set_status not implemented");
 }
 
+//Set thread's tcb_status to status.
 int sys_set_thread_status(int sysno, u_int threadid, u_int status)
 {
 	//printf("begin to set %d \n", status);
@@ -411,23 +390,17 @@ int sys_set_thread_status(int sysno, u_int threadid, u_int status)
 	if (status > 2 || status < 0) {
         return -E_INVAL;
     }
-	r = threadid2tcb(threadid, &t);
-	//tcb = &env->env_threads[0];
-	//printf("r is %d\n", r);
-	if (r < 0)
+	if ((r = threadid2tcb(threadid, &t)) < 0) {
 		return r;
-	//printf("thread's id is %b\n", threadid);
-	//t->tcb_status = status;
-	//LIST_INSERT_HEAD(tcb_sched_list, t, tcb_sched_link);
+	}
 	
-	if ((status == ENV_RUNNABLE)&&(t->tcb_status != ENV_RUNNABLE)) {
+	if ((status == ENV_RUNNABLE) && (t->tcb_status != ENV_RUNNABLE)) {
 		LIST_INSERT_HEAD(tcb_sched_list, t, tcb_sched_link);
-	} else if((t->tcb_status == ENV_RUNNABLE)&&(status != ENV_RUNNABLE)) {
-		LIST_REMOVE(t,tcb_sched_link);
+	} else if((t->tcb_status == ENV_RUNNABLE) && (status != ENV_RUNNABLE)) {
+		LIST_REMOVE(t, tcb_sched_link);
 	}
 	t->tcb_status = status;
 	return 0;
-
 }
 
 /* Overview:
@@ -585,35 +558,40 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	return 0;
 }
 
+// solve the request that curent thread wants to join the target thread.
 int sys_thread_join(int sysno, u_int threadid, void **value_ptr)
 {
 	struct Tcb *t;
 	int r;
-	//printf("here id is 0x%x\n",threadid);
-	r = threadid2tcb(threadid,&t);
-	//printf("find id is 0x%x\n",t->thread_id);
-	if (r < 0)
+	if ((r = threadid2tcb(threadid, &t)) < 0) {
 		return r;
-	printf("tcb_detach is %d\n", t->tcb_detach);
+	}
+
+	//printf("tcb_detach is %d\n", t->tcb_detach);
+	//can't join a thread that is detached!
 	if (t->tcb_detach) {
 		return -E_THREAD_JOIN_FAIL;
 	}
+	
+	//stop join immediately when the target thread exits.
 	if (t->tcb_status == ENV_FREE) {
 		if (value_ptr != 0) {
 			*value_ptr = t->tcb_exit_ptr;
 		}
 		return 0;
 	}
-	printf("ready to in joinlist!\n");
-	//printf("father id is 0x%x\n",t->thread_id);
-	//LIST_INSERT_HEAD(&t->tcb_joined_list,curtcb,tcb_joined_link);
-    if (t->tcb_joined != NULL) {
-        return -1;//already exist
-    }
-    t->tcb_joined = curtcb;
+
+	printf("ready to in join!\n");
     
+	if (t->tcb_joined != NULL) {
+        return -1;                 //the target thread has already been waited by a thread
+    }
+
+    t->tcb_joined = curtcb;
 	curtcb->tcb_join_value_ptr = value_ptr;
-	sys_set_thread_status(0,curtcb->thread_id,ENV_NOT_RUNNABLE);
+	
+	sys_set_thread_status(0, curtcb->thread_id, ENV_NOT_RUNNABLE);
+	
 	struct Trapframe *trap = (struct Trapframe *)(KERNEL_SP - sizeof(struct Trapframe));
 	trap->regs[2] = 0;
 	trap->pc = trap->cp0_epc;
@@ -621,7 +599,7 @@ int sys_thread_join(int sysno, u_int threadid, void **value_ptr)
 	return 0;
 }
 
-
+//destroy the sem
 int sys_sem_destroy(int sysno,sem_t *sem)
 {
 	if ((sem->sem_envid != curenv->env_id) && (sem->sem_shared == 0)) {
@@ -632,33 +610,34 @@ int sys_sem_destroy(int sysno,sem_t *sem)
 	return 0;
 }
 
+// P
 int sys_sem_wait(int sysno,sem_t *sem)
 {
 	if (sem->sem_wait_count == -1) {
 		return -E_SEM_ERROR;
 	}
-	int i;
+
     sem->sem_value--;
 	if (sem->sem_value >= 0) {
 		return 0;
 	}
 	if (sem->sem_wait_count >= 10) {
-		printf("beyond limit!\n");
-		return -E_SEM_ERROR; //beyond the limit
+		printf("exceed limit!\n");
+		return -E_SEM_ERROR; //exceed the limit
 	}
 	sem->sem_wait_queue[sem->sem_tail] = curtcb;
 	sem->sem_tail = (sem->sem_tail + 1) % 10;
 	++sem->sem_wait_count;
 	sys_set_thread_status(0, 0, ENV_NOT_RUNNABLE);
+	
 	struct Trapframe *trap = (struct Trapframe *)(KERNEL_SP - sizeof(struct Trapframe));
 	trap->regs[2] = 0;
 	trap->pc = trap->cp0_epc;
-	//printf("wait thread is 0x%x, now %d is wait\n",curtcb->thread_id, sem->sem_wait_count);
 	sys_yield();
-
 	return -E_SEM_ERROR;
 }
 
+// P, but don't block
 int sys_sem_trywait(int sysno, sem_t *sem)
 {
 	if (sem->sem_wait_count == -1) {
@@ -666,11 +645,12 @@ int sys_sem_trywait(int sysno, sem_t *sem)
 	}
     sem->sem_value--;
 	if (sem->sem_value < 0) {
-        return -E_SEM_EAGAIN;  //
+        return -E_SEM_EAGAIN;  // return the wrong type EAGAIN
     }
     return 0;
 }
 
+// V
 int sys_sem_post(int sysno, sem_t *sem)
 {
 	if (sem->sem_wait_count == -1) {
@@ -682,12 +662,12 @@ int sys_sem_post(int sysno, sem_t *sem)
 		sem->sem_wait_count--;
 		t = sem->sem_wait_queue[sem->sem_head];
 		sem->sem_head = (sem->sem_head + 1) % 10;
-		//printf("thread 0x%x wake!\n", t->thread_id);
 		sys_set_thread_status(0, t->thread_id, ENV_RUNNABLE);
 	}
 	return 0;
 }
 
+// get the value of sem
 int sys_sem_getvalue(int sysno, sem_t *sem, int *valp)
 {
 	if (sem->sem_wait_count == -1) {
