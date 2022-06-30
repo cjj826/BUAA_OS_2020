@@ -134,6 +134,7 @@ int pthread_detach(pthread_t thread) {
 // join the target thread
 int pthread_join(pthread_t thread, void **value_ptr) {
 	int r = syscall_thread_join(thread, value_ptr);
+	//writef("r is %d\n", r);
 	return r;
 }
 

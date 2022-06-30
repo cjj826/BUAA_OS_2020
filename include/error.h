@@ -25,11 +25,12 @@
 #define E_THREAD_NOTFOUND 14  // can find the target thread in the process
 #define E_THREAD_CANNOTCANCEL 15 // thread can't be canceled
 #define E_THREAD_JOIN_FAIL 16 // fail when try to join a detached thread
+#define E_MULTI_JOIN     17  //the target thread has already been waited by a thread
 
-#define E_SEM_ERROR	17 // something wrong with the sem
-#define E_SEM_NOTFOUND	18 // can't find the sem
-#define E_SEM_EAGAIN	19 // wrong in the trywait 
+#define E_SEM_ERROR	18 // something wrong with the sem
+#define E_SEM_NOTFOUND	19 // can't find the sem
+#define E_SEM_EAGAIN	20 // wrong in the trywait 
 
-#define MAXERROR 19
+#define MAXERROR 20
 
 #endif // _ERROR_H_

@@ -8,9 +8,6 @@ void exit_son_(void *exit_ptr){
 
     struct Tcb *t = &env->env_threads[thread_id & 0xf];
 	
-	//writef("excute !!!\n");
-	writef("the exit_ptr %x\n", exit_ptr);
-	writef("the exit_ptr is %d\n", *((int *)exit_ptr));
     t->tcb_exit_ptr = exit_ptr;
 
     syscall_thread_destroy(thread_id);
