@@ -124,7 +124,7 @@ again:
 			}
 			// Your code here -- open t for writing,
 			// dup it onto fd 1, and then close the fd you got.
-            if ((fdnum = open (t, O_WRONLY)) < 0) {
+            if ((fdnum = open (t, O_WRONLY | O_TRUNC)) < 0) {
                 writef(" > open error");
                 exit();
             }
