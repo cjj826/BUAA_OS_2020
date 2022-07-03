@@ -583,7 +583,7 @@ int sys_thread_join(int sysno, u_int threadid, void **value_ptr)
 
 	printf("ready to in join!\n");
     
-	if (t->tcb_joined != NULL) {
+	if (t->tcb_joined != NULL && t->tcb_joined->tcb_status != ENV_FREE) {
         return -E_MULTI_JOIN;                 //the target thread has already been waited by a thread
     }
 
