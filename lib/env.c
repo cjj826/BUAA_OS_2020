@@ -546,6 +546,13 @@ void thread_free(struct Tcb *t)
 		env_free(e);
 	}
 	t->tcb_status = ENV_FREE;
+	if (t->tcb_detach == 1) {
+		u_int sp = USTACKTOP - 4 * BY2PG * (t->thread_id & 0xf);
+		u_int i;
+		for (i = 1; i <= 4; i++) {
+			sys_mem_unmap(0, e->env_id, sp - i*BY2PG);
+		}
+	}
 }
 
 /* Overview:
